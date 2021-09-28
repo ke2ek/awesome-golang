@@ -2,6 +2,7 @@ package stack
 
 import "awesome-golang/common"
 
+type T interface{}
 type Element common.Element
 
 type Stack struct {
@@ -17,7 +18,7 @@ func (s Stack) Empty() bool {
 	return s.back == -1
 }
 
-func (s Stack) Top() interface{} {
+func (s Stack) Top() T {
 	return s.elements[s.back].Value
 }
 
@@ -25,7 +26,7 @@ func (s Stack) Size() int {
 	return s.back + 1
 }
 
-func (s *Stack) Push(value interface{}) {
+func (s *Stack) Push(value T) {
 	if !s.Empty() && !common.EqualType(s.Top(), value) {
 		panic("Error: type is not the same.")
 	}

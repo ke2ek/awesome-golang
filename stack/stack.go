@@ -1,21 +1,12 @@
 package stack
 
-import (
-	"fmt"
-	"reflect"
-)
+import "awesome-golang/common"
 
-type Element struct {
-	value interface{}
-}
+type Element common.Element
 
 type Stack struct {
 	elements []*Element
 	back     int
-}
-
-func (e *Element) String() string {
-	return fmt.Sprint(e.value)
 }
 
 func New() *Stack {
@@ -27,7 +18,7 @@ func (s Stack) Empty() bool {
 }
 
 func (s Stack) Top() interface{} {
-	return s.elements[s.back].value
+	return s.elements[s.back].Value
 }
 
 func (s Stack) Size() int {
@@ -35,7 +26,7 @@ func (s Stack) Size() int {
 }
 
 func (s *Stack) Push(value interface{}) {
-	if !s.Empty() && reflect.TypeOf(s.Top()) != reflect.TypeOf(value) {
+	if !s.Empty() && !common.EqualType(s.Top(), value) {
 		panic("Error: type is not the same.")
 	}
 	s.elements = append(s.elements, &Element{value})

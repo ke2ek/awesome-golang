@@ -1,12 +1,14 @@
 package linkedlist
 
+import "fmt"
+
 type SingleLinkedList struct {
 	head     *Node
 	tail     *Node
 	numNodes int
 }
 
-func New() *SingleLinkedList {
+func NewSingleLinkedList() *SingleLinkedList {
 	return &SingleLinkedList{}
 }
 
@@ -29,12 +31,13 @@ func (sll SingleLinkedList) Size() int {
 	return sll.numNodes
 }
 
-func (sll SingleLinkedList) Interate() {
+func (sll SingleLinkedList) Iterate() {
 	node := sll.head
-	for node != sll.tail {
-		node.Print()
+	for node != nil {
+		fmt.Printf("%s ", node)
 		node = node.next
 	}
+	fmt.Println()
 }
 
 func (sll SingleLinkedList) Front() T {
@@ -46,26 +49,56 @@ func (sll SingleLinkedList) Back() T {
 }
 
 func (sll *SingleLinkedList) PushBack(target T) {
-	sll.tail = &Node{Value: target}
+	node := Node{Value: target}
+	if sll.tail == nil {
+		sll.head = &node
+		sll.tail = &node
+	} else {
+		sll.tail.next = &node
+		sll.tail = &node
+	}
 	sll.numNodes++
 }
 
 func (sll *SingleLinkedList) PopBack() {
-	sll.tail = nil
+	if sll.Empty() {
+		panic("PopBack(): list is empty.")
+	}
 	sll.numNodes--
+	node := sll.head
+	if node == sll.tail {
+		sll.head = nil
+		sll.tail = nil
+		return
+	}
+	for node.next != sll.tail {
+		node = node.next
+	}
+	node.next = nil
+	sll.tail = node
 }
 
 func (sll *SingleLinkedList) PushFront(target T) {
-	newNode := Node{Value: target, next: sll.head}
-	sll.head = &newNode
+	node := Node{Value: target, next: sll.head}
+	sll.head = &node
 	sll.numNodes++
+	if sll.tail == nil {
+		sll.tail = sll.head
+	}
 }
 
-func (sll *SingleLinkedList) PopFront(target T) {
+func (sll *SingleLinkedList) PopFront() {
+	if sll.Empty() {
+		panic("PopFront(): list is empty.")
+	}
+	sll.numNodes--
 	newHead := sll.head.next
+	if newHead == nil {
+		sll.tail = nil
+		return
+	}
 	sll.head.next = nil
 	sll.head = newHead
-	sll.numNodes--
 }
 
 func (sll *SingleLinkedList) Swap(l *SingleLinkedList) {
@@ -87,17 +120,20 @@ func (sll *SingleLinkedList) Reverse() {
 }
 
 func (sll *SingleLinkedList) Unique() {
-	prev, curr := sll.head, sll.head.next
-	for curr != nil {
-		for prev.Value == curr.Value {
-			removed := curr
-			prev.next = curr.next
-			curr = curr.next
-			removed.next = nil
-			removed = nil
+	chk := map[string]*Node{}
+	newsll := NewSingleLinkedList()
+	node := sll.head
+	for node != nil {
+		str := fmt.Sprintf("%s", node.Value)
+		if chk[str] == nil {
+			chk[str] = node
+			newsll.PushBack(node)
+		} else {
+			sll.numNodes--
 		}
-		prev, curr = curr, curr.next
+		node = node.next
 	}
+	sll.Swap(newsll)
 }
 
 /*

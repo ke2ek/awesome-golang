@@ -17,10 +17,6 @@ func (n *Node) String() string {
 	return fmt.Sprint(n.Value)
 }
 
-func (n Node) Print() {
-	fmt.Printf("%s", n.Value)
-}
-
 type LinkedList interface {
 	Find(target T) *Node
 	Empty() bool

@@ -40,12 +40,12 @@ func (dll DoubleLinkedList) Iterate() {
 	fmt.Println()
 }
 
-func (dll DoubleLinkedList) Front() T {
-	return dll.head.Value
+func (dll DoubleLinkedList) First() *Node {
+	return dll.head
 }
 
-func (dll DoubleLinkedList) Back() T {
-	return dll.tail.Value
+func (dll DoubleLinkedList) Last() *Node {
+	return dll.tail
 }
 
 func (dll *DoubleLinkedList) PushBack(target T) {

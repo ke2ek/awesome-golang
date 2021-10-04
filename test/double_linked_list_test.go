@@ -3,18 +3,29 @@ package test
 import (
 	"awesome-golang/common"
 	linkedlist "awesome-golang/linked-list"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
+func appendToDll(l *linkedlist.DoubleLinkedList, data []int) {
+	for _, num := range data {
+		l.PushBack(num)
+	}
+}
+
+func validateDll(t *testing.T, l *linkedlist.DoubleLinkedList, data []int) {
+	node := l.First()
+	for _, num := range data {
+		assert.Equal(t, node.Value, num, common.ERROR_MSG)
+		node = node.Next()
+	}
+}
+
 func TestDoubleLinkedList(t *testing.T) {
 	dll := linkedlist.NewDoubleLinkedList()
 	data := []int{7, 3, 6, 1, 0, 8, 1, 6}
-	for _, num := range data {
-		dll.PushBack(num)
-	}
+	appendToDll(dll, data)
 	dll.Iterate()
 	dll.PushFront(0)
 	dll.PushFront(1)
@@ -24,48 +35,37 @@ func TestDoubleLinkedList(t *testing.T) {
 	for i := 0; i < 3; i++ {
 		dll.PopBack()
 		dll.PopFront()
-		dll.Iterate()
 	}
 	assert.Equal(t, dll.Size(), 5, common.ERROR_MSG)
-	// 7 3 6 1 0 -> 0 1 6 3 7
+	ans := []int{7, 3, 6, 1, 0}
+	validateDll(t, dll, ans)
 	dll.Reverse()
+	ans = []int{0, 1, 6, 3, 7}
+	validateDll(t, dll, ans)
 	dll.Iterate()
-	for i := 0; i < 4; i++ {
-		dll.PushBack(0)
-	}
-	dll.PushBack(5)
-	dll.PushBack(8)
-	dll.PushBack(3)
-	dll.PushBack(0)
-	dll.Iterate() // 0 1 6 3 7 0 0 0 0 5 8 3 0
+	data = []int{0, 0, 0, 0, 5, 8, 3, 0}
+	appendToDll(dll, data)
+	ans = []int{0, 1, 6, 3, 7, 0, 0, 0, 0, 5, 8, 3, 0}
+	validateDll(t, dll, ans)
 	dll.Unique()
-	fmt.Print("dll1: ")
-	dll.Iterate() // 0 1 6 3 7 5 8
-	assert.Equal(t, dll.Size(), 7, common.ERROR_MSG)
+	ans = []int{0, 1, 6, 3, 7, 5, 8}
+	validateDll(t, dll, ans)
 
 	dll2 := linkedlist.NewDoubleLinkedList()
 	data = []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
-	for _, num := range data {
-		dll2.PushBack(num)
-	}
-	fmt.Print("dll2: ")
-	dll2.Iterate()
+	appendToDll(dll2, data)
 	toNode := dll2.Find(5)
 	dll2.Insert(toNode, dll)
-	fmt.Print("dll2: ")
-	dll2.Iterate() // 1 2 3 4 0 1 6 3 7 5 8 5 6 7 8 9
-	assert.Equal(t, dll2.Size(), 16, common.ERROR_MSG)
+	ans = []int{1, 2, 3, 4, 0, 1, 6, 3, 7, 5, 8, 5, 6, 7, 8, 9}
+	validateDll(t, dll2, ans)
+	assert.Equal(t, dll2.Size(), len(ans), common.ERROR_MSG)
 	dll2.Unique()
-	dll2.Iterate() // 1 2 3 4 0 6 7 5 8 9
-	assert.Equal(t, dll2.Size(), 10, common.ERROR_MSG)
+	ans = []int{1, 2, 3, 4, 0, 6, 7, 5, 8, 9}
+	validateDll(t, dll2, ans)
+	assert.Equal(t, dll2.Size(), len(ans), common.ERROR_MSG)
 	dll2.Erase(0)
 	dll2.Erase(5)
-	dll2.Iterate() // 1 2 3 4 6 7 8 9
-	assert.Equal(t, dll2.Size(), 8, common.ERROR_MSG)
-
-	data = []int{0, 5, 10}
-	dll3 := linkedlist.NewDoubleLinkedList()
-	for _, num := range data {
-		dll3.PushBack(num)
-	}
+	ans = []int{1, 2, 3, 4, 6, 7, 8, 9}
+	validateDll(t, dll2, ans)
+	assert.Equal(t, dll2.Size(), len(ans), common.ERROR_MSG)
 }

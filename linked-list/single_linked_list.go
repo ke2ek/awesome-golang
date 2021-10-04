@@ -40,12 +40,12 @@ func (sll SingleLinkedList) Iterate() {
 	fmt.Println()
 }
 
-func (sll SingleLinkedList) Front() T {
-	return sll.head.Value
+func (sll SingleLinkedList) First() *Node {
+	return sll.head
 }
 
-func (sll SingleLinkedList) Back() T {
-	return sll.tail.Value
+func (sll SingleLinkedList) Last() *Node {
+	return sll.tail
 }
 
 func (sll *SingleLinkedList) PushBack(target T) {

@@ -18,13 +18,21 @@ func (n *Node) String() string {
 	return fmt.Sprint(n.Value)
 }
 
+func (n *Node) Next() *Node {
+	return n.next
+}
+
+func (n *Node) Prev() *Node {
+	return n.prev
+}
+
 type LinkedList interface {
 	Find(target T) *Node
 	Empty() bool
 	Size() int
 	Iterate()
-	Front() T
-	Back() T
+	First() *Node
+	Last() *Node
 	PushBack()
 	PopBack()
 	PushFront()

@@ -14,27 +14,27 @@ func New() *Stack {
 	return &Stack{back: -1}
 }
 
-func (s Stack) Empty() bool {
-	return s.back == -1
+func (this *Stack) Empty() bool {
+	return this.back == -1
 }
 
-func (s Stack) Top() T {
-	return s.elements[s.back].Value
+func (this *Stack) Top() T {
+	return this.elements[this.back].Value
 }
 
-func (s Stack) Size() int {
-	return s.back + 1
+func (this *Stack) Size() int {
+	return this.back + 1
 }
 
-func (s *Stack) Push(value T) {
-	if !s.Empty() && !common.EqualType(s.Top(), value) {
+func (this *Stack) Push(value T) {
+	if !this.Empty() && !common.EqualType(this.Top(), value) {
 		panic("Error: type is not the same.")
 	}
-	s.elements = append(s.elements, &Element{value})
-	s.back++
+	this.elements = append(this.elements, &Element{value})
+	this.back++
 }
 
-func (s *Stack) Pop() {
-	s.elements = s.elements[:s.back]
-	s.back--
+func (this *Stack) Pop() {
+	this.elements = this.elements[:this.back]
+	this.back--
 }

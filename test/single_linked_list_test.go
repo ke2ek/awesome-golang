@@ -2,19 +2,19 @@ package test
 
 import (
 	"awesome-golang/common"
-	linkedlist "awesome-golang/linked-list"
+	"awesome-golang/list"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func appendToSll(l *linkedlist.SingleLinkedList, data []int) {
+func appendToSll(l *list.SingleLinkedList, data []int) {
 	for _, num := range data {
 		l.PushBack(num)
 	}
 }
 
-func validateSll(t *testing.T, l *linkedlist.SingleLinkedList, data []int) {
+func validateSll(t *testing.T, l *list.SingleLinkedList, data []int) {
 	node := l.First()
 	for _, num := range data {
 		assert.Equal(t, node.Value, num, common.ERROR_MSG)
@@ -23,7 +23,7 @@ func validateSll(t *testing.T, l *linkedlist.SingleLinkedList, data []int) {
 }
 
 func TestSingleLinkedList(t *testing.T) {
-	sll := linkedlist.NewSingleLinkedList()
+	sll := list.NewSingleLinkedList()
 	data := []int{7, 3, 6, 1, 0, 8, 1, 6}
 	appendToSll(sll, data)
 	sll.Iterate()

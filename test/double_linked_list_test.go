@@ -2,19 +2,19 @@ package test
 
 import (
 	"awesome-golang/common"
-	linkedlist "awesome-golang/linked-list"
+	"awesome-golang/list"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func appendToDll(l *linkedlist.DoubleLinkedList, data []int) {
+func appendToDll(l *list.DoubleLinkedList, data []int) {
 	for _, num := range data {
 		l.PushBack(num)
 	}
 }
 
-func validateDll(t *testing.T, l *linkedlist.DoubleLinkedList, data []int) {
+func validateDll(t *testing.T, l *list.DoubleLinkedList, data []int) {
 	node := l.First()
 	for _, num := range data {
 		assert.Equal(t, node.Value, num, common.ERROR_MSG)
@@ -23,7 +23,7 @@ func validateDll(t *testing.T, l *linkedlist.DoubleLinkedList, data []int) {
 }
 
 func TestDoubleLinkedList(t *testing.T) {
-	dll := linkedlist.NewDoubleLinkedList()
+	dll := list.NewDoubleLinkedList()
 	data := []int{7, 3, 6, 1, 0, 8, 1, 6}
 	appendToDll(dll, data)
 	dll.Iterate()
@@ -51,7 +51,7 @@ func TestDoubleLinkedList(t *testing.T) {
 	ans = []int{0, 1, 6, 3, 7, 5, 8}
 	validateDll(t, dll, ans)
 
-	dll2 := linkedlist.NewDoubleLinkedList()
+	dll2 := list.NewDoubleLinkedList()
 	data = []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
 	appendToDll(dll2, data)
 	toNode := dll2.Find(5)

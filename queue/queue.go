@@ -14,31 +14,31 @@ func New() *Queue {
 	return &Queue{back: -1}
 }
 
-func (q Queue) Empty() bool {
-	return q.back == -1
+func (this *Queue) Empty() bool {
+	return this.back == -1
 }
 
-func (q Queue) Size() int {
-	return q.back + 1
+func (this *Queue) Size() int {
+	return this.back + 1
 }
 
-func (q Queue) Front() T {
-	return q.elements[0].Value
+func (this *Queue) Front() T {
+	return this.elements[0].Value
 }
 
-func (q Queue) Back() T {
-	return q.elements[q.back].Value
+func (this *Queue) Back() T {
+	return this.elements[this.back].Value
 }
 
-func (q *Queue) Push(value T) {
-	if !q.Empty() && !common.EqualType(q.Back(), value) {
+func (this *Queue) Push(value T) {
+	if !this.Empty() && !common.EqualType(this.Back(), value) {
 		panic("Error: type is not the same.")
 	}
-	q.elements = append(q.elements, &Element{value})
-	q.back++
+	this.elements = append(this.elements, &Element{value})
+	this.back++
 }
 
-func (q *Queue) Pop() {
-	q.elements = q.elements[1:]
-	q.back--
+func (this *Queue) Pop() {
+	this.elements = this.elements[1:]
+	this.back--
 }

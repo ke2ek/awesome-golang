@@ -12,9 +12,9 @@ func NewDoubleLinkedList() *DoubleLinkedList {
 	return &DoubleLinkedList{}
 }
 
-func (dll DoubleLinkedList) Find(target T) *Node {
-	node := dll.head
-	for node != dll.tail {
+func (this *DoubleLinkedList) Find(target T) *Node {
+	node := this.head
+	for node != this.tail {
 		if node.Value == target {
 			return node
 		}
@@ -23,16 +23,16 @@ func (dll DoubleLinkedList) Find(target T) *Node {
 	return nil
 }
 
-func (dll DoubleLinkedList) Empty() bool {
-	return dll.numNodes == 0
+func (this *DoubleLinkedList) Empty() bool {
+	return this.numNodes == 0
 }
 
-func (dll DoubleLinkedList) Size() int {
-	return dll.numNodes
+func (this *DoubleLinkedList) Size() int {
+	return this.numNodes
 }
 
-func (dll DoubleLinkedList) Iterate() {
-	node := dll.head
+func (this *DoubleLinkedList) Iterate() {
+	node := this.head
 	for node != nil {
 		fmt.Printf("%s ", node)
 		node = node.next
@@ -40,95 +40,95 @@ func (dll DoubleLinkedList) Iterate() {
 	fmt.Println()
 }
 
-func (dll DoubleLinkedList) First() *Node {
-	return dll.head
+func (this *DoubleLinkedList) First() *Node {
+	return this.head
 }
 
-func (dll DoubleLinkedList) Last() *Node {
-	return dll.tail
+func (this *DoubleLinkedList) Last() *Node {
+	return this.tail
 }
 
-func (dll *DoubleLinkedList) PushBack(target T) {
-	node := Node{Value: target, prev: dll.tail}
-	if dll.tail == nil {
-		dll.head = &node
-		dll.tail = &node
+func (this *DoubleLinkedList) PushBack(target T) {
+	node := Node{Value: target, prev: this.tail}
+	if this.tail == nil {
+		this.head = &node
+		this.tail = &node
 	} else {
-		dll.tail.next = &node
-		dll.tail = &node
+		this.tail.next = &node
+		this.tail = &node
 	}
-	dll.numNodes++
+	this.numNodes++
 }
 
-func (dll *DoubleLinkedList) PopBack() {
-	if dll.Empty() {
+func (this *DoubleLinkedList) PopBack() {
+	if this.Empty() {
 		panic("PopBack(): list is empty.")
 	}
-	dll.numNodes--
-	removed := dll.tail
-	dll.tail = dll.tail.prev
-	dll.tail.next = nil
-	if removed == dll.head {
-		dll.head = nil
+	this.numNodes--
+	removed := this.tail
+	this.tail = this.tail.prev
+	this.tail.next = nil
+	if removed == this.head {
+		this.head = nil
 		return
 	}
 	removed.prev, removed.next = nil, nil
 	removed = nil
 }
 
-func (dll *DoubleLinkedList) PushFront(target T) {
-	node := Node{Value: target, next: dll.head}
-	dll.head = &node
-	dll.numNodes++
-	if dll.tail == nil {
-		dll.tail = dll.head
+func (this *DoubleLinkedList) PushFront(target T) {
+	node := Node{Value: target, next: this.head}
+	this.head = &node
+	this.numNodes++
+	if this.tail == nil {
+		this.tail = this.head
 	}
 }
 
-func (dll *DoubleLinkedList) PopFront() {
-	if dll.Empty() {
+func (this *DoubleLinkedList) PopFront() {
+	if this.Empty() {
 		panic("PopFront(): list is empty.")
 	}
-	dll.numNodes--
-	removed := dll.head
-	dll.head = dll.head.next
-	dll.head.prev = nil
-	if removed == dll.tail {
-		dll.tail = nil
+	this.numNodes--
+	removed := this.head
+	this.head = this.head.next
+	this.head.prev = nil
+	if removed == this.tail {
+		this.tail = nil
 		return
 	}
 	removed.prev, removed.next = nil, nil
 	removed = nil
 }
 
-func (dll *DoubleLinkedList) Swap(l *DoubleLinkedList) {
-	h, t := dll.head, dll.tail
-	dll.head, dll.tail = l.head, l.tail
+func (this *DoubleLinkedList) Swap(l *DoubleLinkedList) {
+	h, t := this.head, this.tail
+	this.head, this.tail = l.head, l.tail
 	l.head, l.tail = h, t
 }
 
-func (dll *DoubleLinkedList) Reverse() {
+func (this *DoubleLinkedList) Reverse() {
 	l := NewDoubleLinkedList()
-	for dll.tail != nil {
-		l.PushBack(dll.tail.Value)
-		dll.tail = dll.tail.prev
+	for this.tail != nil {
+		l.PushBack(this.tail.Value)
+		this.tail = this.tail.prev
 	}
-	dll.Swap(l)
+	this.Swap(l)
 }
 
-func (dll *DoubleLinkedList) Unique() {
+func (this *DoubleLinkedList) Unique() {
 	chk := map[string]*Node{}
-	node := dll.head
+	node := this.head
 	for node != nil {
 		str := fmt.Sprintf("%s", node.Value)
 		if chk[str] == nil {
 			chk[str] = node
 			node = node.next
-			dll.tail = node
+			this.tail = node
 		} else {
-			dll.numNodes--
+			this.numNodes--
 			removed := node
-			dll.tail = removed.prev
+			this.tail = removed.prev
 			node = node.next
 			removed.prev.next = removed.next
 			if removed.next != nil {
@@ -140,29 +140,29 @@ func (dll *DoubleLinkedList) Unique() {
 	}
 }
 
-func (dll *DoubleLinkedList) Insert(to *Node, l *DoubleLinkedList) {
+func (this *DoubleLinkedList) Insert(to *Node, l *DoubleLinkedList) {
 	if l.head == nil {
 		return
 	}
 	if to == nil {
-		dll.tail.next = l.head
-		l.head.prev = dll.tail
-		dll.tail = l.tail
+		this.tail.next = l.head
+		l.head.prev = this.tail
+		this.tail = l.tail
 		return
 	}
 	if to.prev != nil {
 		to.prev.next = l.head
 		l.head.prev = to.prev
 	} else {
-		dll.head = l.head
+		this.head = l.head
 	}
 	to.prev = l.tail
 	l.tail.next = to
-	dll.numNodes += l.numNodes
+	this.numNodes += l.numNodes
 }
 
-func (dll *DoubleLinkedList) Erase(target T) {
-	removed := dll.Find(target)
+func (this *DoubleLinkedList) Erase(target T) {
+	removed := this.Find(target)
 	if removed == nil {
 		return
 	}
@@ -170,26 +170,5 @@ func (dll *DoubleLinkedList) Erase(target T) {
 	removed.next.prev = removed.prev
 	removed.prev, removed.next = nil, nil
 	removed = nil
-	dll.numNodes--
-}
-
-// if it returns -1, lhs is less than rhs.
-// if it returns 1, lhs is greater than rhs.
-// if it returns 0, lhs equals to rhs.
-type fn func(T, T) int
-
-// Assume that two lists have been sorted already.
-func Merge(l1 *DoubleLinkedList, l2 *DoubleLinkedList, op fn) *DoubleLinkedList {
-	dll := NewDoubleLinkedList()
-	n1, n2 := l1.head, l2.head
-	for n1 != l1.tail && n2 != l2.tail {
-		if op(n1.Value, n2.Value) <= 0 {
-			dll.PushBack(n1.Value)
-			n1 = n1.next
-		} else {
-			dll.PushBack(n2.Value)
-			n2 = n2.next
-		}
-	}
-	return nil
+	this.numNodes--
 }

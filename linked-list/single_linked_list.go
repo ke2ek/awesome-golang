@@ -12,9 +12,9 @@ func NewSingleLinkedList() *SingleLinkedList {
 	return &SingleLinkedList{}
 }
 
-func (sll SingleLinkedList) Find(target T) *Node {
-	node := sll.head
-	for node != sll.tail {
+func (this *SingleLinkedList) Find(target T) *Node {
+	node := this.head
+	for node != this.tail {
 		if node.Value == target {
 			return node
 		}
@@ -23,16 +23,16 @@ func (sll SingleLinkedList) Find(target T) *Node {
 	return nil
 }
 
-func (sll SingleLinkedList) Empty() bool {
-	return sll.numNodes == 0
+func (this *SingleLinkedList) Empty() bool {
+	return this.numNodes == 0
 }
 
-func (sll SingleLinkedList) Size() int {
-	return sll.numNodes
+func (this *SingleLinkedList) Size() int {
+	return this.numNodes
 }
 
-func (sll SingleLinkedList) Iterate() {
-	node := sll.head
+func (this *SingleLinkedList) Iterate() {
+	node := this.head
 	for node != nil {
 		fmt.Printf("%s ", node)
 		node = node.next
@@ -40,96 +40,96 @@ func (sll SingleLinkedList) Iterate() {
 	fmt.Println()
 }
 
-func (sll SingleLinkedList) First() *Node {
-	return sll.head
+func (this *SingleLinkedList) First() *Node {
+	return this.head
 }
 
-func (sll SingleLinkedList) Last() *Node {
-	return sll.tail
+func (this *SingleLinkedList) Last() *Node {
+	return this.tail
 }
 
-func (sll *SingleLinkedList) PushBack(target T) {
+func (this *SingleLinkedList) PushBack(target T) {
 	node := Node{Value: target}
-	if sll.tail == nil {
-		sll.head = &node
-		sll.tail = &node
+	if this.tail == nil {
+		this.head = &node
+		this.tail = &node
 	} else {
-		sll.tail.next = &node
-		sll.tail = &node
+		this.tail.next = &node
+		this.tail = &node
 	}
-	sll.numNodes++
+	this.numNodes++
 }
 
-func (sll *SingleLinkedList) PopBack() {
-	if sll.Empty() {
+func (this *SingleLinkedList) PopBack() {
+	if this.Empty() {
 		panic("PopBack(): list is empty.")
 	}
-	sll.numNodes--
-	node := sll.head
-	if node == sll.tail {
-		sll.head = nil
-		sll.tail = nil
+	this.numNodes--
+	node := this.head
+	if node == this.tail {
+		this.head = nil
+		this.tail = nil
 		node.next = nil
 		return
 	}
-	for node.next != sll.tail {
+	for node.next != this.tail {
 		node = node.next
 	}
 	node.next = nil
-	sll.tail = node
+	this.tail = node
 }
 
-func (sll *SingleLinkedList) PushFront(target T) {
-	node := Node{Value: target, next: sll.head}
-	sll.head = &node
-	sll.numNodes++
-	if sll.tail == nil {
-		sll.tail = sll.head
+func (this *SingleLinkedList) PushFront(target T) {
+	node := Node{Value: target, next: this.head}
+	this.head = &node
+	this.numNodes++
+	if this.tail == nil {
+		this.tail = this.head
 	}
 }
 
-func (sll *SingleLinkedList) PopFront() {
-	if sll.Empty() {
+func (this *SingleLinkedList) PopFront() {
+	if this.Empty() {
 		panic("PopFront(): list is empty.")
 	}
-	sll.numNodes--
-	newHead := sll.head.next
+	this.numNodes--
+	newHead := this.head.next
 	if newHead == nil {
-		sll.tail = nil
+		this.tail = nil
 		return
 	}
-	sll.head.next = nil
-	sll.head = newHead
+	this.head.next = nil
+	this.head = newHead
 }
 
-func (sll *SingleLinkedList) Swap(l *SingleLinkedList) {
-	h, t := sll.head, sll.tail
-	sll.head, sll.tail = l.head, l.tail
+func (this *SingleLinkedList) Swap(l *SingleLinkedList) {
+	h, t := this.head, this.tail
+	this.head, this.tail = l.head, l.tail
 	l.head, l.tail = h, t
 }
 
-func (sll *SingleLinkedList) Reverse() {
-	sll.tail = sll.head
-	prev, curr := sll.head, sll.head.next
+func (this *SingleLinkedList) Reverse() {
+	this.tail = this.head
+	prev, curr := this.head, this.head.next
 	prev.next = nil
 	for curr != nil {
 		next := curr.next
 		curr.next = prev
 		prev, curr = curr, next
 	}
-	sll.head = prev
+	this.head = prev
 }
 
-func (sll *SingleLinkedList) Unique() {
+func (this *SingleLinkedList) Unique() {
 	chk := map[string]*Node{}
-	prev, node := sll.head, sll.head
+	prev, node := this.head, this.head
 	for node != nil {
 		str := fmt.Sprintf("%s", node.Value)
 		if chk[str] == nil {
 			chk[str] = node
 			prev, node = node, node.next
 		} else {
-			sll.numNodes--
+			this.numNodes--
 			removed := node
 			node = node.next
 			prev.next = removed.next
@@ -137,5 +137,5 @@ func (sll *SingleLinkedList) Unique() {
 			removed = nil
 		}
 	}
-	sll.tail = prev
+	this.tail = prev
 }

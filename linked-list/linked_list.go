@@ -14,16 +14,16 @@ func NewNode() *Node {
 	return &Node{}
 }
 
-func (n *Node) String() string {
-	return fmt.Sprint(n.Value)
+func (this *Node) String() string {
+	return fmt.Sprint(this.Value)
 }
 
-func (n *Node) Next() *Node {
-	return n.next
+func (this *Node) Next() *Node {
+	return this.next
 }
 
-func (n *Node) Prev() *Node {
-	return n.prev
+func (this *Node) Prev() *Node {
+	return this.prev
 }
 
 type LinkedList interface {

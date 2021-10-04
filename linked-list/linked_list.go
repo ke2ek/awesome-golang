@@ -7,6 +7,7 @@ type T interface{}
 type Node struct {
 	Value T
 	next  *Node
+	prev  *Node
 }
 
 func NewNode() *Node {

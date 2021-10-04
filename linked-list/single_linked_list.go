@@ -69,6 +69,7 @@ func (sll *SingleLinkedList) PopBack() {
 	if node == sll.tail {
 		sll.head = nil
 		sll.tail = nil
+		node.next = nil
 		return
 	}
 	for node.next != sll.tail {
@@ -121,36 +122,20 @@ func (sll *SingleLinkedList) Reverse() {
 
 func (sll *SingleLinkedList) Unique() {
 	chk := map[string]*Node{}
-	newsll := NewSingleLinkedList()
-	node := sll.head
+	prev, node := sll.head, sll.head
 	for node != nil {
 		str := fmt.Sprintf("%s", node.Value)
 		if chk[str] == nil {
 			chk[str] = node
-			newsll.PushBack(node)
+			prev, node = node, node.next
 		} else {
 			sll.numNodes--
+			removed := node
+			node = node.next
+			prev.next = removed.next
+			removed.next = nil
+			removed = nil
 		}
-		node = node.next
 	}
-	sll.Swap(newsll)
+	sll.tail = prev
 }
-
-/*
-empty
-size
-front
-back
-insert -> double linked list
-erase
-push_back
-push_front
-pop_back
-pop_front
-swap : swaps the contents
-reverse : reverses the order of the elements
-unique : removes consecutive duplicate elements
-merge : merges two sorted lists
-iterate : visit
-find
-*/

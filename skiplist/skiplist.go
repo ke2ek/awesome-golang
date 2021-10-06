@@ -71,9 +71,6 @@ func (this *Skiplist) Add(num int) {
 	}
 	// curr is gonna be what we want to find or upper bound of it at the bottom (a.k.a. 0)
 	curr = curr.next[0]
-	if curr.value == num {
-		return
-	}
 	nextLevel := this.randomLevel()
 	if nextLevel > this.level {
 		// Fill empty pointers as what this.head is pointing

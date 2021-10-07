@@ -2,7 +2,6 @@ package queue
 
 import "awesome-golang/common"
 
-type T interface{}
 type Element common.Element
 
 type Queue struct {
@@ -22,15 +21,15 @@ func (this *Queue) Size() int {
 	return this.back + 1
 }
 
-func (this *Queue) Front() T {
+func (this *Queue) Front() interface{} {
 	return this.elements[0].Value
 }
 
-func (this *Queue) Back() T {
+func (this *Queue) Back() interface{} {
 	return this.elements[this.back].Value
 }
 
-func (this *Queue) Push(value T) {
+func (this *Queue) Push(value interface{}) {
 	if !this.Empty() && !common.EqualType(this.Back(), value) {
 		panic("Error: type is not the same.")
 	}

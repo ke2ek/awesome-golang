@@ -8,13 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-/*
-				      5
-			  4 		      8
-		  3      7       86       12
-	   64  1  nil  56  nil  nil  nil  102
-*/
-
 func makeTree() *tree.Node {
 	node64 := tree.NewNode(64, nil, nil)
 	node1 := tree.NewNode(1, nil, nil)

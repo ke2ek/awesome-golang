@@ -4,18 +4,14 @@ import (
 	"awesome-golang/queue"
 )
 
-type Node struct {
+type BTNode struct {
 	Value interface{}
-	Left  *Node
-	Right *Node
-}
-
-func NewNode(value interface{}, left *Node, right *Node) *Node {
-	return &Node{Value: value, Left: left, Right: right}
+	Left  *BTNode
+	Right *BTNode
 }
 
 // parent -> left -> right
-func (this *Node) PreOrder(nodes *([]*Node)) {
+func (this *BTNode) PreOrder(nodes *([]*BTNode)) {
 	*nodes = append(*nodes, this)
 	if this.Left != nil {
 		this.Left.PreOrder(nodes)
@@ -26,7 +22,7 @@ func (this *Node) PreOrder(nodes *([]*Node)) {
 }
 
 // left -> parent -> right
-func (this *Node) InOrder(nodes *([]*Node)) {
+func (this *BTNode) InOrder(nodes *([]*BTNode)) {
 	if this.Left != nil {
 		this.Left.InOrder(nodes)
 	}
@@ -37,7 +33,7 @@ func (this *Node) InOrder(nodes *([]*Node)) {
 }
 
 // left -> right -> parent
-func (this *Node) PostOrder(nodes *([]*Node)) {
+func (this *BTNode) PostOrder(nodes *([]*BTNode)) {
 	if this.Left != nil {
 		this.Left.PostOrder(nodes)
 	}
@@ -48,14 +44,14 @@ func (this *Node) PostOrder(nodes *([]*Node)) {
 }
 
 // Traverse level by level
-func (this *Node) BFS(nodes *([][]*Node)) {
+func (this *BTNode) BFS(nodes *([][]*BTNode)) {
 	q := queue.New()
 	q.Push(this)
 	for !q.Empty() {
 		sz := q.Size()
-		v := make([]*Node, sz)
+		v := make([]*BTNode, sz)
 		for i := 0; i < sz; i++ {
-			here := q.Front().(*Node)
+			here := q.Front().(*BTNode)
 			v[i] = here
 			q.Pop()
 			if here.Left != nil {

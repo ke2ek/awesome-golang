@@ -8,23 +8,23 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func makeTree() *tree.Node {
-	node64 := tree.NewNode(64, nil, nil)
-	node1 := tree.NewNode(1, nil, nil)
-	node56 := tree.NewNode(56, nil, nil)
-	node102 := tree.NewNode(102, nil, nil)
+func makeTree() *tree.BTNode {
+	node64 := tree.BTNode{Value: 64}
+	node1 := tree.BTNode{Value: 1}
+	node56 := tree.BTNode{Value: 56}
+	node102 := tree.BTNode{Value: 102}
 
-	node3 := tree.NewNode(3, node64, node1)
-	node7 := tree.NewNode(7, nil, node56)
-	node12 := tree.NewNode(12, nil, node102)
-	node86 := tree.NewNode(86, nil, nil)
+	node3 := tree.BTNode{Value: 3, Left: &node64, Right: &node1}
+	node7 := tree.BTNode{Value: 7, Right: &node56}
+	node12 := tree.BTNode{Value: 12, Right: &node102}
+	node86 := tree.BTNode{Value: 86}
 
-	node4 := tree.NewNode(4, node3, node7)
-	node8 := tree.NewNode(8, node86, node12)
+	node4 := tree.BTNode{Value: 4, Left: &node3, Right: &node7}
+	node8 := tree.BTNode{Value: 8, Left: &node86, Right: &node12}
 
-	node5 := tree.NewNode(5, node4, node8)
+	node5 := tree.BTNode{Value: 5, Left: &node4, Right: &node8}
 
-	return node5
+	return &node5
 }
 
 func TestBinaryTree(t *testing.T) {
@@ -35,7 +35,7 @@ func TestBinaryTree(t *testing.T) {
 		{64, 1, 3, 56, 7, 4, 86, 102, 12, 8, 5}, // post-order
 		{5, 4, 8, 3, 7, 86, 12, 64, 1, 56, 102}, // bfs
 	}
-	nodes := make([][]*tree.Node, 3)
+	nodes := make([][]*tree.BTNode, 3)
 	root.PreOrder(&nodes[0])
 	root.InOrder(&nodes[1])
 	root.PostOrder(&nodes[2])
@@ -45,7 +45,7 @@ func TestBinaryTree(t *testing.T) {
 		}
 	}
 
-	nodes = [][]*tree.Node{}
+	nodes = [][]*tree.BTNode{}
 	root.BFS(&nodes)
 	i, j := 0, 0
 	for i < len(ans[3]) && j < len(nodes) {

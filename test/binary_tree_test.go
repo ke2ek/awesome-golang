@@ -1,29 +1,29 @@
 package test
 
 import (
-	"awesome-golang/tree"
+	tree "awesome-golang/binary-tree"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func makeTree() *tree.BTNode {
-	node64 := tree.BTNode{Value: 64}
-	node1 := tree.BTNode{Value: 1}
-	node56 := tree.BTNode{Value: 56}
-	node102 := tree.BTNode{Value: 102}
+	node64 := tree.NewBTNode(64, nil, nil)
+	node1 := tree.NewBTNode(1, nil, nil)
+	node56 := tree.NewBTNode(56, nil, nil)
+	node102 := tree.NewBTNode(102, nil, nil)
 
-	node3 := tree.BTNode{Value: 3, Left: &node64, Right: &node1}
-	node7 := tree.BTNode{Value: 7, Right: &node56}
-	node12 := tree.BTNode{Value: 12, Right: &node102}
-	node86 := tree.BTNode{Value: 86}
+	node3 := tree.NewBTNode(3, node64, node1)
+	node7 := tree.NewBTNode(7, nil, node56)
+	node86 := tree.NewBTNode(86, nil, nil)
+	node12 := tree.NewBTNode(12, nil, node102)
 
-	node4 := tree.BTNode{Value: 4, Left: &node3, Right: &node7}
-	node8 := tree.BTNode{Value: 8, Left: &node86, Right: &node12}
+	node4 := tree.NewBTNode(4, node3, node7)
+	node8 := tree.NewBTNode(8, node86, node12)
 
-	node5 := tree.BTNode{Value: 5, Left: &node4, Right: &node8}
+	node5 := tree.NewBTNode(5, node4, node8)
 
-	return &node5
+	return node5
 }
 
 func TestBinaryTree(t *testing.T) {
@@ -34,22 +34,21 @@ func TestBinaryTree(t *testing.T) {
 		{64, 1, 3, 56, 7, 4, 86, 102, 12, 8, 5}, // post-order
 		{5, 4, 8, 3, 7, 86, 12, 64, 1, 56, 102}, // bfs
 	}
-	nodes := make([][]*tree.BTNode, 3)
-	root.PreOrder(&nodes[0])
-	root.InOrder(&nodes[1])
-	root.PostOrder(&nodes[2])
+	nodes := make([][]interface{}, 3)
+	tree.PreOrder(root, &nodes[0])
+	tree.InOrder(root, &nodes[1])
+	tree.PostOrder(root, &nodes[2])
 	for i := 0; i < 3; i++ {
 		for j, num := range ans[i] {
-			assert.Equal(t, num, nodes[i][j].Value.(int))
+			assert.Equal(t, num, nodes[i][j].(int))
 		}
 	}
 
-	nodes = [][]*tree.BTNode{}
-	root.BFS(&nodes)
+	result := *(tree.BFS(root))
 	i, j := 0, 0
-	for i < len(ans[3]) && j < len(nodes) {
-		for _, node := range nodes[j] {
-			assert.Equal(t, ans[3][i], node.Value.(int))
+	for i < len(ans[3]) && j < len(result) {
+		for _, value := range result[j] {
+			assert.Equal(t, ans[3][i], value.(int))
 			i++
 		}
 		j++

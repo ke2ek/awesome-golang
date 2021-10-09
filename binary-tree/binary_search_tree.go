@@ -53,23 +53,20 @@ func (this *BSTNode) Remove(key int) interface{} {
 		this.right = this.right.Remove(key).(*BSTNode)
 	} else {
 		if key != this.key {
-			panic("Remove(): it has no key = " + strconv.Itoa(key))
+			panic("Remove(): it has no key the same as " + strconv.Itoa(key))
 		}
 		// Remove the key here.
 		if this.left != nil && this.right != nil {
 			// Find the successor.
-			successorParent, successor := this, this.right
-			for successor.left != nil {
-				successorParent = successor
-				successor = successor.left
-			}
+			parent, child := GetSuccessor(this)
+			successorParent, successor := parent.(*BSTNode), child.(*BSTNode)
 			// Move the successor to this.
-			this.key, this.value = successor.key, successor.value
 			if successorParent != this {
 				successorParent.left = successor.Remove(successor.key).(*BSTNode)
 			} else {
 				successorParent.right = successor.Remove(successor.key).(*BSTNode)
 			}
+			this.key, this.value = successor.key, successor.value
 		} else if this.left != nil {
 			return this.left
 		} else if this.right != nil {
@@ -103,6 +100,15 @@ func TrimBST(node *BSTNode, low, high int) *BSTNode {
 }
 
 // Common
+func GetSuccessor(root BST) (interface{}, interface{}) {
+	successorParent, successor := root, root.Right().(BST)
+	for !common.IsNil(successor.Left()) {
+		successorParent = successor
+		successor = successor.Left().(BST)
+	}
+	return successorParent, successor
+}
+
 func Search(root BST, target int) interface{} {
 	if common.IsNil(root) {
 		return nil

@@ -1,57 +1,14 @@
 package tree
 
+import (
+	"strconv"
+)
+
 type BSTNode struct {
-	Key    int
-	Value  interface{}
-	left   *BSTNode
-	right  *BSTNode
-	parent *BSTNode
-}
-
-func (this *BSTNode) getSuccessor() *BSTNode {
-	node := this
-	for node.left != nil {
-		node = node.left
-	}
-	return node
-}
-
-func (this *BSTNode) replaceInParent(node *BSTNode) {
-	if this.parent != nil {
-		if this == this.parent.left {
-			this.parent.left = node
-		} else {
-			this.parent.right = node
-		}
-	}
-	if node != nil {
-		node.parent = this.parent
-	}
-}
-
-func (this *BSTNode) Remove(key int) bool {
-	if key < this.Key {
-		this.left.Remove(key)
-	} else if key > this.Key {
-		this.right.Remove(key)
-	} else {
-		if key != this.Key {
-			return false
-		}
-		// Remove the key here.
-		if this.left != nil && this.right != nil {
-			successor := this.getSuccessor()
-			this.Key, this.Value = successor.Key, successor.Value
-			successor.Remove(successor.Key)
-		} else if this.left != nil {
-			this.replaceInParent(this.left)
-		} else if this.right != nil {
-			this.replaceInParent(this.right)
-		} else { // If there is no child
-			this.replaceInParent(nil)
-		}
-	}
-	return true
+	Key   int
+	Value interface{}
+	left  *BSTNode
+	right *BSTNode
 }
 
 func (this *BSTNode) Add(key int, value interface{}) {
@@ -62,14 +19,12 @@ func (this *BSTNode) Add(key int, value interface{}) {
 			this.left.Add(key, value)
 		} else {
 			this.left = &BSTNode{Key: key, Value: value}
-			this.left.parent = this
 		}
 	} else if key > this.Key {
 		if this.right != nil {
 			this.right.Add(key, value)
 		} else {
 			this.right = &BSTNode{Key: key, Value: value}
-			this.right.parent = this
 		}
 	}
 }
@@ -83,6 +38,41 @@ func (this *BSTNode) Search(key int) interface{} {
 		return this.right.Search(key)
 	}
 	return nil
+}
+
+func (this *BSTNode) Remove(key int) *BSTNode {
+	if key < this.Key {
+		this.left = this.left.Remove(key)
+	} else if key > this.Key {
+		this.right = this.right.Remove(key)
+	} else {
+		if key != this.Key {
+			panic("Remove(): it has no key = " + strconv.Itoa(key))
+		}
+		// Remove the key here.
+		if this.left != nil && this.right != nil {
+			// Find the successor.
+			successorParent, successor := this, this.right
+			for successor.left != nil {
+				successorParent = successor
+				successor = successor.left
+			}
+			// Move the successor to this.
+			this.Key, this.Value = successor.Key, successor.Value
+			if successorParent != this {
+				successorParent.left = successor.Remove(successor.Key)
+			} else {
+				successorParent.right = successor.Remove(successor.Key)
+			}
+		} else if this.left != nil {
+			return this.left
+		} else if this.right != nil {
+			return this.right
+		} else { // If there is no child
+			return nil
+		}
+	}
+	return this
 }
 
 // Common

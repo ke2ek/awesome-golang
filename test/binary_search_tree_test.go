@@ -34,13 +34,14 @@ func makeData() map[int]*Person {
 func TestBinarySearchTree(t *testing.T) {
 	data := makeData()
 	root := &tree.BSTNode{Key: 8}
-	for key, value := range data {
-		root.Add(key, value)
+	insertedOrder := []int{8, 4, 12, 2, 1, 3, 5, 6, 7, 9, 23, 14, 27}
+	for _, key := range insertedOrder {
+		root.Add(key, data[key])
 	}
 
-	ans := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 14, 23, 27}
 	nodes := []*tree.BSTNode{}
 	tree.TraverseInOrder(root, &nodes)
+	ans := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 14, 23, 27}
 	for i, node := range nodes {
 		assert.Equal(t, ans[i], node.Key)
 		person := root.Search(ans[i]).(*Person)
@@ -49,15 +50,46 @@ func TestBinarySearchTree(t *testing.T) {
 
 	removed := []int{6, 27, 23, 4}
 	for _, target := range removed {
-		assert.Equal(t, true, root.Remove(target))
+		root = root.Remove(target)
 		assert.Equal(t, nil, root.Search(target))
 	}
-	/*
-		nodes = []*tree.BSTNode{}
-		ans = []int{1, 2, 3, 5, 7, 8, 9, 12, 14}
-		tree.TraverseInOrder(root, &nodes)
-		for i, node := range nodes {
-			assert.Equal(t, node.Key, ans[i])
-		}
-	*/
+
+	nodes = []*tree.BSTNode{}
+	tree.TraverseInOrder(root, &nodes)
+	ans = []int{1, 2, 3, 5, 7, 8, 9, 12, 14}
+	for i, node := range nodes {
+		assert.Equal(t, ans[i], node.Key)
+	}
+
+	// Remove a root.
+	root = root.Remove(8)
+	nodes = []*tree.BSTNode{}
+	tree.TraverseInOrder(root, &nodes)
+	ans = []int{1, 2, 3, 5, 7, 9, 12, 14}
+	for i, node := range nodes {
+		assert.Equal(t, node.Key, ans[i])
+	}
+
+	// Check if it is a binary search tree.
+	assert.Equal(t, true, tree.IsBST(root, 1, 14))
+	assert.Equal(t, false, tree.IsBST(root, 2, 13))
+
+	// Search interatively.
+	ans = []int{3, 5, 14}
+	for _, key := range ans {
+		person := tree.SearchIteratively(root, key).(*Person)
+		assert.Equal(t, data[key].Name, person.Name)
+	}
+	assert.Equal(t, nil, tree.SearchIteratively(root, 8))
+
+	// Trim nodes out of [3, 10].
+	root.Add(10, &Person{No: 10, Name: "Jay", Age: 24})
+	root.Add(11, &Person{No: 11, Name: "Ray", Age: 31})
+	root = tree.Trim(root, 3, 10)
+	nodes = []*tree.BSTNode{}
+	tree.TraverseInOrder(root, &nodes)
+	ans = []int{3, 5, 7, 9, 10}
+	for i, node := range nodes {
+		assert.Equal(t, node.Key, ans[i])
+	}
 }

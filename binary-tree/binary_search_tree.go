@@ -34,13 +34,13 @@ func (this *BSTNode) Add(key int, value interface{}) interface{} {
 		if this.left != nil {
 			this.left.Add(key, value)
 		} else {
-			this.left = &BSTNode{key: key, value: value}
+			this.left = NewBSTNode(key, value, nil, nil)
 		}
 	} else if key > this.key {
 		if this.right != nil {
 			this.right.Add(key, value)
 		} else {
-			this.right = &BSTNode{key: key, value: value}
+			this.right = NewBSTNode(key, value, nil, nil)
 		}
 	}
 	return (*BSTNode)(nil)

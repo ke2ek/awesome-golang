@@ -1,7 +1,6 @@
 package test
 
 import (
-	"awesome-golang/common"
 	"awesome-golang/skiplist"
 	"testing"
 
@@ -21,18 +20,18 @@ func TestSkiplist(t *testing.T) {
 
 	removed := []int{245, 18, 432, 36, 13}
 	for _, num := range removed {
-		assert.Equal(t, sl.Search(num), true, common.ERROR_MSG)
-		assert.Equal(t, sl.Erase(num), true, common.ERROR_MSG)
+		assert.Equal(t, true, sl.Search(num))
+		assert.Equal(t, true, sl.Erase(num))
 		sl.Print()
-		assert.Equal(t, sl.Search(num), false, common.ERROR_MSG)
+		assert.Equal(t, false, sl.Search(num))
 	}
 
 	removed = []int{300, 88, 66}
 	for _, num := range removed {
-		assert.Equal(t, sl.Search(num), true, common.ERROR_MSG)
-		assert.Equal(t, sl.Erase(num), true, common.ERROR_MSG)
-		assert.Equal(t, sl.Search(num), true, common.ERROR_MSG)
-		assert.Equal(t, sl.Erase(num), true, common.ERROR_MSG)
-		assert.Equal(t, sl.Search(num), false, common.ERROR_MSG)
+		assert.Equal(t, true, sl.Search(num))
+		assert.Equal(t, true, sl.Erase(num))
+		assert.Equal(t, true, sl.Search(num))
+		assert.Equal(t, true, sl.Erase(num))
+		assert.Equal(t, false, sl.Search(num))
 	}
 }

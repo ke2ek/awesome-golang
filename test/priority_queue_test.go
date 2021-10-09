@@ -1,7 +1,6 @@
 package test
 
 import (
-	"awesome-golang/common"
 	priorityqueue "awesome-golang/priority-queue"
 	"fmt"
 	"testing"
@@ -33,8 +32,8 @@ func TestPriorityQueue(t *testing.T) {
 	for i, num := range ans {
 		x := pq.Pop()
 		fmt.Println(i, num, x.Key)
-		assert.Equal(t, x.Key, num, common.ERROR_MSG)
-		assert.Equal(t, pq.Size(), len(ans)-1-i, common.ERROR_MSG)
+		assert.Equal(t, num, x.Key)
+		assert.Equal(t, len(ans)-1-i, pq.Size())
 	}
-	assert.Equal(t, pq.Empty(), true, common.ERROR_MSG)
+	assert.Equal(t, true, pq.Empty())
 }

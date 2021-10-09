@@ -1,7 +1,6 @@
 package test
 
 import (
-	"awesome-golang/common"
 	"awesome-golang/list"
 	"testing"
 
@@ -17,7 +16,7 @@ func appendToDll(l *list.DoubleLinkedList, data []int) {
 func validateDll(t *testing.T, l *list.DoubleLinkedList, data []int) {
 	node := l.First()
 	for _, num := range data {
-		assert.Equal(t, node.Value, num, common.ERROR_MSG)
+		assert.Equal(t, num, node.Value)
 		node = node.Next()
 	}
 }
@@ -31,12 +30,12 @@ func TestDoubleLinkedList(t *testing.T) {
 	dll.PushFront(1)
 	dll.PushFront(0)
 	dll.Iterate()
-	assert.Equal(t, dll.Size(), 11, common.ERROR_MSG)
+	assert.Equal(t, 11, dll.Size())
 	for i := 0; i < 3; i++ {
 		dll.PopBack()
 		dll.PopFront()
 	}
-	assert.Equal(t, dll.Size(), 5, common.ERROR_MSG)
+	assert.Equal(t, 5, dll.Size())
 	ans := []int{7, 3, 6, 1, 0}
 	validateDll(t, dll, ans)
 	dll.Reverse()
@@ -58,14 +57,14 @@ func TestDoubleLinkedList(t *testing.T) {
 	dll2.Insert(toNode, dll)
 	ans = []int{1, 2, 3, 4, 0, 1, 6, 3, 7, 5, 8, 5, 6, 7, 8, 9}
 	validateDll(t, dll2, ans)
-	assert.Equal(t, dll2.Size(), len(ans), common.ERROR_MSG)
+	assert.Equal(t, len(ans), dll2.Size())
 	dll2.Unique()
 	ans = []int{1, 2, 3, 4, 0, 6, 7, 5, 8, 9}
 	validateDll(t, dll2, ans)
-	assert.Equal(t, dll2.Size(), len(ans), common.ERROR_MSG)
+	assert.Equal(t, len(ans), dll2.Size())
 	dll2.Erase(0)
 	dll2.Erase(5)
 	ans = []int{1, 2, 3, 4, 6, 7, 8, 9}
 	validateDll(t, dll2, ans)
-	assert.Equal(t, dll2.Size(), len(ans), common.ERROR_MSG)
+	assert.Equal(t, len(ans), dll2.Size())
 }

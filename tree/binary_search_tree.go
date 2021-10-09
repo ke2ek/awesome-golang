@@ -29,12 +29,15 @@ func (this *BSTNode) replaceInParent(node *BSTNode) {
 	}
 }
 
-func (this *BSTNode) Remove(key int) {
+func (this *BSTNode) Remove(key int) bool {
 	if key < this.Key {
 		this.left.Remove(key)
 	} else if key > this.Key {
 		this.right.Remove(key)
 	} else {
+		if key != this.Key {
+			return false
+		}
 		// Remove the key here.
 		if this.left != nil && this.right != nil {
 			successor := this.getSuccessor()
@@ -48,6 +51,7 @@ func (this *BSTNode) Remove(key int) {
 			this.replaceInParent(nil)
 		}
 	}
+	return true
 }
 
 func (this *BSTNode) Add(key int, value interface{}) {
@@ -58,12 +62,14 @@ func (this *BSTNode) Add(key int, value interface{}) {
 			this.left.Add(key, value)
 		} else {
 			this.left = &BSTNode{Key: key, Value: value}
+			this.left.parent = this
 		}
 	} else if key > this.Key {
 		if this.right != nil {
 			this.right.Add(key, value)
 		} else {
 			this.right = &BSTNode{Key: key, Value: value}
+			this.right.parent = this
 		}
 	}
 }

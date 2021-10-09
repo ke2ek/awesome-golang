@@ -1,7 +1,6 @@
 package test
 
 import (
-	"awesome-golang/common"
 	"awesome-golang/stack"
 	"testing"
 
@@ -13,12 +12,12 @@ func TestStack(t *testing.T) {
 	stk.Push(123)
 	stk.Push(489)
 	stk.Push(973)
-	assert.Equal(t, stk.Size(), 3, common.ERROR_MSG)
-	assert.Equal(t, stk.Top(), 973, common.ERROR_MSG)
+	assert.Equal(t, 3, stk.Size())
+	assert.Equal(t, 973, stk.Top())
 	stk.Pop()
-	assert.Equal(t, stk.Top(), 489, common.ERROR_MSG)
+	assert.Equal(t, 489, stk.Top())
 	stk.Pop()
-	assert.Equal(t, stk.Top(), 123, common.ERROR_MSG)
+	assert.Equal(t, 123, stk.Top())
 	stk.Pop()
-	assert.Equal(t, stk.Empty(), true, common.ERROR_MSG)
+	assert.Equal(t, true, stk.Empty())
 }

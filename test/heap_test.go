@@ -1,7 +1,6 @@
 package test
 
 import (
-	"awesome-golang/common"
 	"awesome-golang/heap"
 	"testing"
 
@@ -17,6 +16,6 @@ func TestMinHeap(t *testing.T) {
 
 	for i := 1; i < 7; i++ {
 		val := heap.Pop(h).(int)
-		assert.Equal(t, val, i, common.ERROR_MSG)
+		assert.Equal(t, i, val)
 	}
 }

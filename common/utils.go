@@ -5,8 +5,6 @@ import (
 	"reflect"
 )
 
-const ERROR_MSG string = "The two values should be the same."
-
 type Element struct {
 	Value interface{}
 }

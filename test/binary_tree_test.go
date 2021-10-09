@@ -1,7 +1,6 @@
 package test
 
 import (
-	"awesome-golang/common"
 	"awesome-golang/tree"
 	"testing"
 
@@ -41,7 +40,7 @@ func TestBinaryTree(t *testing.T) {
 	root.PostOrder(&nodes[2])
 	for i := 0; i < 3; i++ {
 		for j, num := range ans[i] {
-			assert.Equal(t, nodes[i][j].Value.(int), num, common.ERROR_MSG)
+			assert.Equal(t, num, nodes[i][j].Value.(int))
 		}
 	}
 
@@ -50,7 +49,7 @@ func TestBinaryTree(t *testing.T) {
 	i, j := 0, 0
 	for i < len(ans[3]) && j < len(nodes) {
 		for _, node := range nodes[j] {
-			assert.Equal(t, node.Value.(int), ans[3][i], common.ERROR_MSG)
+			assert.Equal(t, ans[3][i], node.Value.(int))
 			i++
 		}
 		j++

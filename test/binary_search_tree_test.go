@@ -1,7 +1,7 @@
 package test
 
 import (
-	"awesome-golang/tree"
+	tree "awesome-golang/binary-tree"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -33,41 +33,41 @@ func makeData() map[int]*Person {
 
 func TestBinarySearchTree(t *testing.T) {
 	data := makeData()
-	root := &tree.BSTNode{Key: 8}
+	root := tree.NewBSTNode(8, nil, nil, nil)
 	insertedOrder := []int{8, 4, 12, 2, 1, 3, 5, 6, 7, 9, 23, 14, 27}
 	for _, key := range insertedOrder {
 		root.Add(key, data[key])
 	}
 
-	nodes := []*tree.BSTNode{}
-	tree.TraverseInOrder(root, &nodes)
+	nodes := make([]interface{}, 0)
+	tree.InOrder(root, &nodes)
 	ans := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 14, 23, 27}
 	for i, node := range nodes {
-		assert.Equal(t, ans[i], node.Key)
-		person := root.Search(ans[i]).(*Person)
-		assert.Equal(t, data[ans[i]].Name, person.Name)
+		assert.Equal(t, data[ans[i]], node.(*Person))
+		result := tree.Search(root, ans[i])
+		assert.Equal(t, data[ans[i]].Name, result.(*Person).Name)
 	}
 
 	removed := []int{6, 27, 23, 4}
 	for _, target := range removed {
-		root = root.Remove(target)
-		assert.Equal(t, nil, root.Search(target))
+		root = root.Remove(target).(*tree.BSTNode)
+		assert.Equal(t, nil, tree.Search(root, target))
 	}
 
-	nodes = []*tree.BSTNode{}
-	tree.TraverseInOrder(root, &nodes)
+	nodes = make([]interface{}, 0)
+	tree.InOrder(root, &nodes)
 	ans = []int{1, 2, 3, 5, 7, 8, 9, 12, 14}
 	for i, node := range nodes {
-		assert.Equal(t, ans[i], node.Key)
+		assert.Equal(t, ans[i], node.(*Person).No)
 	}
 
 	// Remove a root.
-	root = root.Remove(8)
-	nodes = []*tree.BSTNode{}
-	tree.TraverseInOrder(root, &nodes)
+	root = root.Remove(8).(*tree.BSTNode)
+	nodes = make([]interface{}, 0)
+	tree.InOrder(root, &nodes)
 	ans = []int{1, 2, 3, 5, 7, 9, 12, 14}
 	for i, node := range nodes {
-		assert.Equal(t, node.Key, ans[i])
+		assert.Equal(t, ans[i], node.(*Person).No)
 	}
 
 	// Check if it is a binary search tree.
@@ -77,19 +77,19 @@ func TestBinarySearchTree(t *testing.T) {
 	// Search interatively.
 	ans = []int{3, 5, 14}
 	for _, key := range ans {
-		person := tree.SearchIteratively(root, key).(*Person)
-		assert.Equal(t, data[key].Name, person.Name)
+		result := tree.SearchIteratively(root, key)
+		assert.Equal(t, data[key].Name, result.(*Person).Name)
 	}
 	assert.Equal(t, nil, tree.SearchIteratively(root, 8))
 
 	// Trim nodes out of [3, 10].
 	root.Add(10, &Person{No: 10, Name: "Jay", Age: 24})
 	root.Add(11, &Person{No: 11, Name: "Ray", Age: 31})
-	root = tree.Trim(root, 3, 10)
-	nodes = []*tree.BSTNode{}
-	tree.TraverseInOrder(root, &nodes)
+	root = tree.TrimBST(root, 3, 10)
+	nodes = make([]interface{}, 0)
+	tree.InOrder(root, &nodes)
 	ans = []int{3, 5, 7, 9, 10}
 	for i, node := range nodes {
-		assert.Equal(t, node.Key, ans[i])
+		assert.Equal(t, ans[i], node.(*Person).No)
 	}
 }

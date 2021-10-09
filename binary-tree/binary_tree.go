@@ -5,45 +5,45 @@ import (
 	"awesome-golang/queue"
 )
 
-type Node interface {
-	Key() interface{}
+type I interface {
+	Key() int
 	Value() interface{}
 	Left() interface{}
 	Right() interface{}
 }
 
 // parent -> left -> right
-func PreOrder(node Node, nodes *([]interface{})) {
+func PreOrder(node I, nodes *([]interface{})) {
 	if common.IsNil(node) {
 		return
 	}
 	*nodes = append(*nodes, node.Value())
-	PreOrder(node.Left().(Node), nodes)
-	PreOrder(node.Right().(Node), nodes)
+	PreOrder(node.Left().(I), nodes)
+	PreOrder(node.Right().(I), nodes)
 }
 
 // left -> parent -> right
-func InOrder(node Node, nodes *([]interface{})) {
+func InOrder(node I, nodes *([]interface{})) {
 	if common.IsNil(node) {
 		return
 	}
-	InOrder(node.Left().(Node), nodes)
+	InOrder(node.Left().(I), nodes)
 	*nodes = append(*nodes, node.Value())
-	InOrder(node.Right().(Node), nodes)
+	InOrder(node.Right().(I), nodes)
 }
 
 // left -> right -> parent
-func PostOrder(node Node, nodes *([]interface{})) {
+func PostOrder(node I, nodes *([]interface{})) {
 	if common.IsNil(node) {
 		return
 	}
-	PostOrder(node.Left().(Node), nodes)
-	PostOrder(node.Right().(Node), nodes)
+	PostOrder(node.Left().(I), nodes)
+	PostOrder(node.Right().(I), nodes)
 	*nodes = append(*nodes, node.Value())
 }
 
 // Traverse level by level
-func BFS(root Node) *([][]interface{}) {
+func BFS(root I) *([][]interface{}) {
 	nodes := make([][]interface{}, 0)
 	q := queue.New()
 	q.Push(root)
@@ -51,7 +51,7 @@ func BFS(root Node) *([][]interface{}) {
 		sz := q.Size()
 		v := make([]interface{}, sz)
 		for i := 0; i < sz; i++ {
-			here := q.Front().(Node)
+			here := q.Front().(I)
 			v[i] = here.Value()
 			q.Pop()
 			if !common.IsNil(here.Left()) {
@@ -67,17 +67,17 @@ func BFS(root Node) *([][]interface{}) {
 }
 
 // Implementation
-type BTNode struct {
+type Node struct {
 	value interface{}
-	left  *BTNode
-	right *BTNode
+	left  *Node
+	right *Node
 }
 
-func NewBTNode(value interface{}, left, right *BTNode) *BTNode {
-	return &BTNode{value: value, left: left, right: right}
+func NewNode(value interface{}, left, right *Node) *Node {
+	return &Node{value: value, left: left, right: right}
 }
 
-func (this *BTNode) Key() interface{}   { return this } // not used
-func (this *BTNode) Value() interface{} { return this.value }
-func (this *BTNode) Left() interface{}  { return this.left }
-func (this *BTNode) Right() interface{} { return this.right }
+func (this *Node) Key() int           { return 1 } // not used
+func (this *Node) Value() interface{} { return this.value }
+func (this *Node) Left() interface{}  { return this.left }
+func (this *Node) Right() interface{} { return this.right }

@@ -7,21 +7,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func makeTree() *tree.BTNode {
-	node64 := tree.NewBTNode(64, nil, nil)
-	node1 := tree.NewBTNode(1, nil, nil)
-	node56 := tree.NewBTNode(56, nil, nil)
-	node102 := tree.NewBTNode(102, nil, nil)
+func makeTree() *tree.Node {
+	node64 := tree.NewNode(64, nil, nil)
+	node1 := tree.NewNode(1, nil, nil)
+	node56 := tree.NewNode(56, nil, nil)
+	node102 := tree.NewNode(102, nil, nil)
 
-	node3 := tree.NewBTNode(3, node64, node1)
-	node7 := tree.NewBTNode(7, nil, node56)
-	node86 := tree.NewBTNode(86, nil, nil)
-	node12 := tree.NewBTNode(12, nil, node102)
+	node3 := tree.NewNode(3, node64, node1)
+	node7 := tree.NewNode(7, nil, node56)
+	node86 := tree.NewNode(86, nil, nil)
+	node12 := tree.NewNode(12, nil, node102)
 
-	node4 := tree.NewBTNode(4, node3, node7)
-	node8 := tree.NewBTNode(8, node86, node12)
+	node4 := tree.NewNode(4, node3, node7)
+	node8 := tree.NewNode(8, node86, node12)
 
-	node5 := tree.NewBTNode(5, node4, node8)
+	node5 := tree.NewNode(5, node4, node8)
 
 	return node5
 }

@@ -30,7 +30,7 @@ const (
 	MISSISSIPI = "mississipi"
 )
 
-func TestSuffixArrayNaive(t *testing.T) {
+func TestSuffixArray(t *testing.T) {
 	sfa := stringsuffix.NewSuffixArrayNaive(BANANA).Array()
 	sfa2 := stringsuffix.NewSuffixArray(BANANA).Array()
 	ans := []string{"a", "ana", "anana", "banana", "na", "nana"}
@@ -54,6 +54,13 @@ func TestSuffixArrayNaive(t *testing.T) {
 	}
 }
 
+func TestLCPArray(t *testing.T) {
+	lcp := stringsuffix.GetLongestCommonPrefix(BANANA)
+	assert.Equal(t, "ana", lcp)
+	lcp = stringsuffix.GetLongestCommonPrefix(MISSISSIPI)
+	assert.Equal(t, "issi", lcp)
+}
+
 /*
 Initial: 0 1 2 3 4 5 6 7 8 9
 Suffix Array:
@@ -68,45 +75,6 @@ Group[7] = 8: ipi
 Group[8] = 15: pi
 Group[9] = 8: i
 
-t = 2: 9 7 1 4 0 8 3 6 2 5
-Suffix Array:
-Group[9] = 8: i
-Group[7] = 8: ipi
-Group[1] = 8: ississipi
-Group[4] = 8: issipi
-Group[0] = 12: mississipi
-Group[8] = 15: pi
-Group[3] = 18: sissipi
-Group[6] = 18: sipi
-Group[2] = 18: ssissipi
-Group[5] = 18: ssipi
-----------------
-t = 4: 9 7 1 4 0 8 6 3 5 2
-Suffix Array:
-Group[9] = 0: i
-Group[7] = 1: ipi
-Group[1] = 2: ississipi
-Group[4] = 2: issipi
-Group[0] = 3: mississipi
-Group[8] = 4: pi
-Group[6] = 5: sipi
-Group[3] = 5: sissipi
-Group[5] = 6: ssipi
-Group[2] = 6: ssissipi
-----------------
-t = 8: 9 7 4 1 0 8 6 3 5 2
-Suffix Array:
-Group[9] = 0: i
-Group[7] = 1: ipi
-Group[4] = 2: issipi
-Group[1] = 2: ississipi
-Group[0] = 3: mississipi
-Group[8] = 4: pi
-Group[6] = 5: sipi
-Group[3] = 6: sissipi
-Group[5] = 7: ssipi
-Group[2] = 8: ssissipi
-----------------
 t = 16: 9 7 4 1 0 8 6 3 5 2
 Suffix Array:
 Group[9] = 0: i

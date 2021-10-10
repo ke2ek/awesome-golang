@@ -4,9 +4,16 @@ import "fmt"
 
 func GetLongestCommonPrefix(s string) string {
 	N := len(s)
+	// sfa[i] := the start index of each suffix by ascending order.
 	sfa := NewSuffixArray(s).Array()
+
+	for i, idx := range sfa {
+		fmt.Printf("sfa[%d] = %d : %s\n", i, idx, s[idx:])
+	}
+
+	// prevSfa[i] := the index of the previous suffix on the suffix starting from i.
 	prevSfa := make([]int, N)
-	prevLcp := make([]int, N)
+	// lcp[i] := the length of lcp on the suffix starting from i which means s[i:].
 	lcp := make([]int, N)
 
 	prevSfa[sfa[0]] = -1
@@ -16,7 +23,7 @@ func GetLongestCommonPrefix(s string) string {
 
 	for i, common := 0, 0; i < N; i++ {
 		if prevSfa[i] == -1 {
-			prevLcp[i] = 0
+			lcp[i] = 0
 		} else {
 			for i+common < N && prevSfa[i]+common < N {
 				if s[i+common] == s[prevSfa[i]+common] {
@@ -25,22 +32,19 @@ func GetLongestCommonPrefix(s string) string {
 					break
 				}
 			}
-			prevLcp[i] = common
+			lcp[i] = common
 			if common > 0 {
 				common--
 			}
 		}
 	}
 
-	maxLen, start := 0, 0
+	maxLen, sIdx := 0, 0
 	for i := 0; i < N; i++ {
-		lcp[i] = prevLcp[sfa[i]]
 		if lcp[i] > maxLen {
 			maxLen = lcp[i]
-			start = i
+			sIdx = i
 		}
 	}
-
-	fmt.Println(lcp)
-	return s[start+1 : start+1+maxLen]
+	return s[sIdx : sIdx+maxLen]
 }

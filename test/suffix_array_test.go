@@ -55,10 +55,13 @@ func TestSuffixArray(t *testing.T) {
 }
 
 func TestLCPArray(t *testing.T) {
-	lcp := stringsuffix.GetLongestCommonPrefix(BANANA)
+	var lcp string
+	lcp = stringsuffix.GetLongestCommonPrefix(BANANA)
 	assert.Equal(t, "ana", lcp)
 	lcp = stringsuffix.GetLongestCommonPrefix(MISSISSIPI)
 	assert.Equal(t, "issi", lcp)
+	lcp = stringsuffix.GetLongestCommonPrefix("aa")
+	assert.Equal(t, "a", lcp)
 }
 
 /*

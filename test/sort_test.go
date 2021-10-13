@@ -10,9 +10,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const N = 10000
+
 func TestBubbleSort(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
-	N := int(1e5)
 	arr, ans := make([]int, N), make([]int, N)
 	for i := 0; i < N; i++ {
 		arr[i] = rand.Intn(N)
@@ -27,7 +28,6 @@ func TestBubbleSort(t *testing.T) {
 
 func TestQuickSort(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
-	N := int(1e5)
 	arr, ans := make([]int, N), make([]int, N)
 	for i := 0; i < N; i++ {
 		arr[i] = rand.Intn(N)
@@ -35,6 +35,20 @@ func TestQuickSort(t *testing.T) {
 	}
 	sort.Ints(ans)
 	mySort.QuickSort(&arr, 0, N-1)
+	for i := 0; i < N; i++ {
+		assert.Equal(t, ans[i], arr[i])
+	}
+}
+
+func TestMergeSort(t *testing.T) {
+	rand.Seed(time.Now().UnixNano())
+	arr, ans := make([]int, N), make([]int, N)
+	for i := 0; i < N; i++ {
+		arr[i] = rand.Intn(N)
+		ans[i] = arr[i]
+	}
+	sort.Ints(ans)
+	arr = mySort.MergeSort(&arr, 0, N-1)
 	for i := 0; i < N; i++ {
 		assert.Equal(t, ans[i], arr[i])
 	}

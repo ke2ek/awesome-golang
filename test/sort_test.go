@@ -26,6 +26,20 @@ func TestBubbleSort(t *testing.T) {
 	}
 }
 
+func TestInsertionSort(t *testing.T) {
+	rand.Seed(time.Now().UnixNano())
+	arr, ans := make([]int, N), make([]int, N)
+	for i := 0; i < N; i++ {
+		arr[i] = rand.Intn(N)
+		ans[i] = arr[i]
+	}
+	sort.Ints(ans)
+	mySort.InsertionSort(&arr)
+	for i := 0; i < N; i++ {
+		assert.Equal(t, ans[i], arr[i])
+	}
+}
+
 func TestQuickSort(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 	arr, ans := make([]int, N), make([]int, N)

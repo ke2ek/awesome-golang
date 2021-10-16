@@ -81,3 +81,17 @@ func TestShellSort(t *testing.T) {
 		assert.Equal(t, ans[i], arr[i])
 	}
 }
+
+func TestRadixSort(t *testing.T) {
+	rand.Seed(time.Now().UnixNano())
+	arr, ans := make([]int, N), make([]int, N)
+	for i := 0; i < N; i++ {
+		arr[i] = rand.Intn(N * 100)
+		ans[i] = arr[i]
+	}
+	sort.Ints(ans)
+	mySort.RadixSort(&arr, 10)
+	for i := 0; i < N; i++ {
+		assert.Equal(t, ans[i], arr[i])
+	}
+}

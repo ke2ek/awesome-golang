@@ -1,6 +1,7 @@
 package test
 
 import (
+	"awesome-golang/common"
 	suffixarray "awesome-golang/strings/suffix-array"
 	"testing"
 
@@ -25,40 +26,35 @@ suffix array:
 2: nana
 */
 
-const (
-	BANANA     = "banana"
-	MISSISSIPI = "mississipi"
-)
-
 func TestSuffixArray(t *testing.T) {
-	sfa := suffixarray.NewSuffixArrayNaive(BANANA).Array()
-	sfa2 := suffixarray.NewSuffixArray(BANANA).Array()
+	sfa := suffixarray.NewSuffixArrayNaive(common.BANANA).Array()
+	sfa2 := suffixarray.NewSuffixArray(common.BANANA).Array()
 	ans := []string{"a", "ana", "anana", "banana", "na", "nana"}
 	for i, idx := range sfa {
-		assert.Equal(t, ans[i], BANANA[idx:])
+		assert.Equal(t, ans[i], common.BANANA[idx:])
 	}
 
 	for i, idx := range sfa2 {
-		assert.Equal(t, ans[i], BANANA[idx:])
+		assert.Equal(t, ans[i], common.BANANA[idx:])
 	}
 
-	sfa3 := suffixarray.NewSuffixArrayNaive(MISSISSIPI).Array()
-	sfa4 := suffixarray.NewSuffixArray(MISSISSIPI).Array()
+	sfa3 := suffixarray.NewSuffixArrayNaive(common.MISSISSIPI).Array()
+	sfa4 := suffixarray.NewSuffixArray(common.MISSISSIPI).Array()
 	ans = []string{"i", "ipi", "issipi", "ississipi", "mississipi", "pi", "sipi", "sissipi", "ssipi", "ssissipi"}
 	for i, idx := range sfa3 {
-		assert.Equal(t, ans[i], MISSISSIPI[idx:])
+		assert.Equal(t, ans[i], common.MISSISSIPI[idx:])
 	}
 
 	for i, idx := range sfa4 {
-		assert.Equal(t, ans[i], MISSISSIPI[idx:])
+		assert.Equal(t, ans[i], common.MISSISSIPI[idx:])
 	}
 }
 
 func TestLCPArray(t *testing.T) {
 	var lcp string
-	lcp = suffixarray.GetLongestCommonPrefix(BANANA)
+	lcp = suffixarray.GetLongestCommonPrefix(common.BANANA)
 	assert.Equal(t, "ana", lcp)
-	lcp = suffixarray.GetLongestCommonPrefix(MISSISSIPI)
+	lcp = suffixarray.GetLongestCommonPrefix(common.MISSISSIPI)
 	assert.Equal(t, "issi", lcp)
 	lcp = suffixarray.GetLongestCommonPrefix("aa")
 	assert.Equal(t, "a", lcp)

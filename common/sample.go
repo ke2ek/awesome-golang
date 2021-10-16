@@ -23,3 +23,8 @@ func MakeData() map[int]*Person {
 		27: &Person{No: 27, Name: "Ken", Age: 29},
 	}
 }
+
+const (
+	BANANA     = "banana"
+	MISSISSIPI = "mississipi"
+)

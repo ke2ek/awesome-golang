@@ -4,17 +4,17 @@ package sort
 // This function is gonna divide the given array into two groups.
 // The numbers coming to the left of the pivot are less than pivot.
 // The numbers coming to the right of the pivot are greater than pivot.
-func partition(arr *[]int, l, r int) int {
-	pivot := (*arr)[r]
+func partition(arr []int, l, r int) int {
+	pivot := arr[r]
 	i := l - 1
 	for j := l; j < r; j++ {
-		if (*arr)[j] < pivot {
+		if arr[j] < pivot {
 			i++
-			(*arr)[i], (*arr)[j] = (*arr)[j], (*arr)[i]
+			arr[i], arr[j] = arr[j], arr[i]
 		}
 	}
 	i++
-	(*arr)[i], (*arr)[r] = (*arr)[r], (*arr)[i]
+	arr[i], arr[r] = arr[r], arr[i]
 	return i
 }
 
@@ -34,7 +34,7 @@ QuickSort(arr, 0, 10) -> QuickSort(arr, 0, 5) -> ... -> QuickSort(arr, 0, 1)
 Iteration in partition: N -> N/2 * 2 = N -> N/4 * 4 = N -> ... -> 1 * N = N
 Thus, it's gonna spend O(NlogN) because the number of recursive calls is gonna be logN.
 */
-func QuickSort(arr *[]int, l, r int) {
+func QuickSort(arr []int, l, r int) {
 	// base case
 	if l >= r {
 		return

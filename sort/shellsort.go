@@ -10,16 +10,16 @@ By starting with far apart elements, it can move some out-of-place elements into
 Time Complexity: O(N*log(N)^2)
 */
 
-func ShellSort(arr *[]int) {
-	for L := len(*arr) / 2; L > 0; L /= 2 {
-		for start := L; start < len(*arr); start++ {
-			hold := (*arr)[start]
+func ShellSort(arr []int) {
+	for L := len(arr) / 2; L > 0; L /= 2 {
+		for start := L; start < len(arr); start++ {
+			hold := arr[start]
 			current := start - L
-			for current >= 0 && (*arr)[current] > hold {
-				(*arr)[current+L] = (*arr)[current]
+			for current >= 0 && arr[current] > hold {
+				arr[current+L] = arr[current]
 				current -= L
 			}
-			(*arr)[current+L] = hold
+			arr[current+L] = hold
 		}
 	}
 }

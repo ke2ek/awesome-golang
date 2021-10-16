@@ -1,9 +1,9 @@
 package sort
 
-func MergeSort(arr *[]int, l, r int) []int {
+func MergeSort(arr []int, l, r int) []int {
 	// base case: arr has been already sorted because there is only one element.
 	if l == r {
-		return []int{(*arr)[l]}
+		return []int{arr[l]}
 	}
 	m := (l + r) / 2
 	left := MergeSort(arr, l, m)

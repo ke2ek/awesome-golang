@@ -1,7 +1,7 @@
 package test
 
 import (
-	stringsuffix "awesome-golang/string-suffix"
+	suffixarray "awesome-golang/strings/suffix-array"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,8 +31,8 @@ const (
 )
 
 func TestSuffixArray(t *testing.T) {
-	sfa := stringsuffix.NewSuffixArrayNaive(BANANA).Array()
-	sfa2 := stringsuffix.NewSuffixArray(BANANA).Array()
+	sfa := suffixarray.NewSuffixArrayNaive(BANANA).Array()
+	sfa2 := suffixarray.NewSuffixArray(BANANA).Array()
 	ans := []string{"a", "ana", "anana", "banana", "na", "nana"}
 	for i, idx := range sfa {
 		assert.Equal(t, ans[i], BANANA[idx:])
@@ -42,8 +42,8 @@ func TestSuffixArray(t *testing.T) {
 		assert.Equal(t, ans[i], BANANA[idx:])
 	}
 
-	sfa3 := stringsuffix.NewSuffixArrayNaive(MISSISSIPI).Array()
-	sfa4 := stringsuffix.NewSuffixArray(MISSISSIPI).Array()
+	sfa3 := suffixarray.NewSuffixArrayNaive(MISSISSIPI).Array()
+	sfa4 := suffixarray.NewSuffixArray(MISSISSIPI).Array()
 	ans = []string{"i", "ipi", "issipi", "ississipi", "mississipi", "pi", "sipi", "sissipi", "ssipi", "ssissipi"}
 	for i, idx := range sfa3 {
 		assert.Equal(t, ans[i], MISSISSIPI[idx:])
@@ -56,11 +56,11 @@ func TestSuffixArray(t *testing.T) {
 
 func TestLCPArray(t *testing.T) {
 	var lcp string
-	lcp = stringsuffix.GetLongestCommonPrefix(BANANA)
+	lcp = suffixarray.GetLongestCommonPrefix(BANANA)
 	assert.Equal(t, "ana", lcp)
-	lcp = stringsuffix.GetLongestCommonPrefix(MISSISSIPI)
+	lcp = suffixarray.GetLongestCommonPrefix(MISSISSIPI)
 	assert.Equal(t, "issi", lcp)
-	lcp = stringsuffix.GetLongestCommonPrefix("aa")
+	lcp = suffixarray.GetLongestCommonPrefix("aa")
 	assert.Equal(t, "a", lcp)
 }
 

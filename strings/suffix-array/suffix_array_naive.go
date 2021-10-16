@@ -1,4 +1,4 @@
-package stringsuffix
+package suffixarray
 
 import (
 	"sort"

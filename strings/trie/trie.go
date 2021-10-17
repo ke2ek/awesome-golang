@@ -14,23 +14,27 @@ type trieNode struct {
 	children map[int]*trieNode
 }
 
-func (this *trieNode) insert(s *string, pos int) {
-	if pos == len(*s) {
+func newTrieNode() *trieNode {
+	return &trieNode{children: map[int]*trieNode{}}
+}
+
+func (this *trieNode) insert(s string, pos int) {
+	if pos == len(s) {
 		this.terminal = true
 		return
 	}
-	key := int((*s)[pos])
+	key := int(s[pos])
 	if this.children[key] == nil {
-		this.children[key] = &trieNode{children: map[int]*trieNode{}}
+		this.children[key] = newTrieNode()
 	}
 	this.children[key].insert(s, pos+1)
 }
 
-func (this *trieNode) find(s *string, pos int) bool {
-	if pos == len(*s) {
+func (this *trieNode) find(s string, pos int) bool {
+	if pos == len(s) {
 		return this.terminal
 	}
-	key := int((*s)[pos])
+	key := int(s[pos])
 	if this.children[key] == nil {
 		return false
 	}
@@ -46,9 +50,31 @@ func New() *Trie {
 }
 
 func (this *Trie) Insert(s string) {
-	this.root.insert(&s, 0)
+	this.root.insert(s, 0)
 }
 
 func (this *Trie) Find(s string) bool {
-	return this.root.find(&s, 0)
+	return this.root.find(s, 0)
+}
+
+func (this *Trie) InsertIterative(s string) {
+	node := this.root
+	for _, ch := range s {
+		if node.children[int(ch)] == nil {
+			node.children[int(ch)] = newTrieNode()
+		}
+		node = node.children[int(ch)]
+	}
+	node.terminal = true
+}
+
+func (this *Trie) FindIterative(s string) bool {
+	node := this.root
+	for _, ch := range s {
+		if node.children[int(ch)] == nil {
+			return false
+		}
+		node = node.children[int(ch)]
+	}
+	return true
 }

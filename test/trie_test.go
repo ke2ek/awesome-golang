@@ -11,18 +11,26 @@ import (
 func TestTrie(t *testing.T) {
 	tc1 := []string{"banana", "banhana", "apple", "append", "count", "compare"}
 	tc2 := []string{}
+	tc3 := []string{}
 	for i := 0; i < len(common.MISSISSIPI); i++ {
 		tc2 = append(tc2, common.MISSISSIPI[i:])
+	}
+	for i := 0; i < len(common.BANANA); i++ {
+		tc3 = append(tc3, common.BANANA[i:])
 	}
 
 	myTrie := trie.New()
 	suffixTrie := trie.New()
+	iterTrie := trie.New()
 
 	for _, s := range tc1 {
 		myTrie.Insert(s)
 	}
 	for _, s := range tc2 {
 		suffixTrie.Insert(s)
+	}
+	for _, s := range tc3 {
+		iterTrie.InsertIterative(s)
 	}
 
 	for _, s := range tc1 {
@@ -32,5 +40,9 @@ func TestTrie(t *testing.T) {
 	for _, s := range tc2 {
 		assert.Equal(t, true, suffixTrie.Find(s))
 		assert.Equal(t, false, myTrie.Find(s))
+	}
+	for _, s := range tc3 {
+		assert.Equal(t, true, iterTrie.FindIterative(s))
+		assert.Equal(t, false, suffixTrie.Find(s))
 	}
 }

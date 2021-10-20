@@ -46,3 +46,12 @@ func TestTrie(t *testing.T) {
 		assert.Equal(t, false, suffixTrie.Find(s))
 	}
 }
+
+func TestSuffixTree(t *testing.T) {
+	tree := trie.NewSuffixTree("abbc")
+	assert.Equal(t, 6, tree.Count())
+
+	tree2 := trie.NewSuffixTree("abcabxabcd$")
+	assert.Equal(t, 16, tree2.Count())
+	assert.Equal(t, 1, 2)
+}

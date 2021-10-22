@@ -255,14 +255,10 @@ func (this *SuffixTree) PrintPretty(node *suffixTreeNode, spaces int) {
 	}
 	for i, key := range keys {
 		if node.children[key] != nil {
-			if i == 0 {
-				this.PrintPretty(node.children[key], spaces+len(s))
-			} else {
-				for j := 0; j < spaces+len(s); j++ {
-					fmt.Print(" ")
-				}
-				this.PrintPretty(node.children[key], spaces+len(s))
+			for j := 0; i > 0 && j < spaces+len(s); j++ {
+				fmt.Print(" ")
 			}
+			this.PrintPretty(node.children[key], spaces+len(s))
 		}
 	}
 }

@@ -2,7 +2,7 @@ package test
 
 import (
 	"awesome-golang/common"
-	"awesome-golang/strings/trie"
+	"awesome-golang/trie"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

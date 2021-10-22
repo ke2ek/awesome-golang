@@ -8,11 +8,11 @@ import (
 /*
 Suffix tree is a compressed trie containing all the suffixes of the given text as their keys and indices in the text as their values.
 
-The construction of such a tree for the string S takes time and space linear in the length of S.
+Using Ukkonen’s algorithm, the construction of such a tree for the string S takes time and space linear in the length of S.
 Suffix trees also provide one of the first linear-time solutions for the longest common substring problem.
 
-The suffix tree for the string S of length n is defined as a tree such that:
-1. The tree has exactly n leaves numbered from 1 to n.
+The suffix tree for the string S of length N is defined as a tree such that:
+1. The tree has exactly n leaves numbered from 1 to N.
 2. Except for the root, every internal node has at least two children.
 3. Each edge is labelled with a non-empty substring of S.
 4. No two edges starting out of a node can have string-labels beginning with the same character.
@@ -27,41 +27,64 @@ Ideas:
 1. This data structure starts from the idea that it reduce some paths without branching from a node to a leaf node
 by each path which has only one edge.
 	- Each label of edges, that are compressed, equals the concatenated edge labels from the node to the leaf node.
-2. Labling edges as suffixes is not efficient because of storing strings,
-so it will be better to label edges as (offset, length) pair which means the start index and the length of each suffix.
-3. Each leaf node stores the start index of the suffix that the path represents.
-4. Each leaf node means the end of substring(=$) because the tree needs to distinguish overlapping substrings.
-	e.g., "abcd" and "ab" are on the same edge if there is no use of $.
-	(Before)
-	root - abcd$
-	(After)
-	root - ab - cd$
-		  - $
+	e.g., Given a trie like "root --a--> node --b--> node --c--> node", it will be changed as "root --abc--> node"
 
-How to build -> Ukkonen’s Algorithm
-1. Whenever adding a suffix to the tree, check if there is another suffix,
-the prefix of which is the same as the suffix to be inserted.
-2. If it exists, branch that node into two nodes, the node with $ (end of string) and the node with other letters,
-where other letters are from the rest of the existing suffix except the prefix(=suffix to be inserted).
-3. Suffix Links
-e.g., one edge with path-label xA, where x is a character and A denotes substring, connects root node and ndoe W via node V
-and another edge with path-label A connects node X and Y.
-In this case, the edge going from node V to node X is so-called a suffix link.
+2. Labling edges as suffixes is not efficient because of storing strings, so it will be better
+to label edges as (start, end) pair which means the start index and the end index of each suffix.
+	- The information about each edge will be stored in each node.
+	e.g., If string S[x:y+1] is "abc", then "root --abc--> node" is gonna be "root --(x,y)--> node"
+
+3. Each leaf node need to be the end of substring(=$) because the tree needs to distinguish overlapping substrings.
+	e.g., Given a string "bcbc", substrings "bc" and "bc", where the first "bc" is in front of the second,
+	are on the same edge if there is no use of $.
+
+		(Before)
+		root - bcbc$
+		(After)
+		root - bc - bc$
+			  - $
+
+How to build: https://www.geeksforgeeks.org/ukkonens-suffix-tree-construction-part-1/
+Assume that we have a string S with the length N, where S has "$" at the end.
+1. We will have N phases and, in each phase, we will process the prefix S[:i+1] (0 <= i < N).
+2. Phase i will proceed at most i extentions, each of which will process the suffix of S[j:i+1] (0 <= j < i+1).
+	- But, whenever one character is added, it doesn't have to visit all the characters of each suffix
+	because of using information from the previous extentions in the current extention.
+	- It will stores information like which node it should start from in each extention.
+		- activeNode, activeEdge, and activeLength will be so useful that we can easily find it.
+	- It will also stores information like where it should go to process remaining suffixes.
+		- remainingSuffixCount, lastNewNode, and suffixLink will be so useful that we can easily move to another node.
+	- There is also use a pointer variable to control all the leaf nodes at a time. => leafEnd
+		- Once a leaf, always a leaf.
+3. When S[j:i+1] is inserted into a suffix tree, we will follow as like below:
+	- Extention Rule 1. if there is S[j:i] on the tree and S[i-1] is the last character of this edge, then just add.
+		- Addition will be done by increasing the end index of all the leaf nodes by 1. So, it will take O(1).
+	- Extention Rule 2. if there is S[j:i] on the tree and S[i] is not the same as the next character of this edge,
+	then it will branch that node into two nodes, where one is a existing leaf node(A) representing a substring
+	starting from S[i-1] of that edge and another is a new leaf node(B) representing only S[i].
+	Also, that branched node will become a new internal node representing S[j:i].
+		- In this case, lastNewNode will be changed as a new internal node.
+	- Extention Rule 3. if there is S[j:i] on the tree and S[i] is the next character of this edge, there's nothing to do.
+		- In this case, remainingSuffixCount won't be decreased.
+4. Suffix Links: one edge with path-label xA, where x is a character and A denotes substring, connects root node and
+ndoe W via node V and another edge with path-label A connects node X and Y.
+The edge going from node V to node X is so-called a suffix link.
+
 	root --x-->  V --A--> W
 	             | <<<<<<<<<<<<< this is a suffix link
 	      ...  - X --A--> Y
 
 If A is empty string, then a suffix link of that node will go to root node.
-4. Edge-label Compression
-
+This can be useful to find each internal node to process the next suffix by O(1).
+5. Keep in mind: all the subtrees of internal nodes connecting with suffix links are the same tree structure.
+	- each edge label of one subtree is the same as the label of another that the subtree is linking.
 */
 
 type suffixTreeNode struct {
-	start       int
-	end         *int
-	suffixIndex int
-	suffixLink  *suffixTreeNode
-	children    map[int]*suffixTreeNode
+	start      int
+	end        *int
+	suffixLink *suffixTreeNode
+	children   map[int]*suffixTreeNode
 }
 
 type SuffixTree struct {
@@ -72,13 +95,11 @@ type SuffixTree struct {
 	root                 *suffixTreeNode
 	lastNewNode          *suffixTreeNode
 	activeNode           *suffixTreeNode
-	count                int
-	activeEdge           int // activeEdge is represented as input string character index (not the character itself)
+	activeEdge           int // Character index to be on the next node = the first letter of an edge to visit the next suffix
 	activeLength         int
-	remainingSuffixCount int // remainingSuffixCount tells how many suffixes yet to be added in tree
+	remainingSuffixCount int // How many suffixes yet to be added in tree
 	leafEnd              int
-	rootEnd              int
-	splitEnd             int
+	count                int
 	size                 int // Length of input string
 	text                 string
 }
@@ -92,6 +113,7 @@ func (this *suffixTreeNode) getSortedKeys() []int {
 	return keys
 }
 
+/* Returns the number of characters of a given edge label. */
 func (this *suffixTreeNode) edgeLength() int {
 	return (*this.end) - this.start + 1
 }
@@ -99,11 +121,10 @@ func (this *suffixTreeNode) edgeLength() int {
 func (this *SuffixTree) newNode(start int, end *int) *suffixTreeNode {
 	this.count++
 	node := &suffixTreeNode{
-		start:       start,
-		end:         end,
-		suffixIndex: -1,
-		suffixLink:  this.root,
-		children:    map[int]*suffixTreeNode{},
+		start:      start,
+		end:        end,
+		suffixLink: this.root,
+		children:   map[int]*suffixTreeNode{},
 	}
 	return node
 }
@@ -114,7 +135,7 @@ and adjust activeEdge and activeLength accordingly to represent same activePoint
 func (this *SuffixTree) walkDown(current *suffixTreeNode) bool {
 	edgeLen := current.edgeLength()
 	if this.activeLength >= edgeLen {
-		this.activeEdge = int(this.text[this.activeEdge+edgeLen] - ' ')
+		this.activeEdge = int(this.text[(*current.end)+1])
 		this.activeLength -= edgeLen
 		this.activeNode = current
 		return true
@@ -122,7 +143,7 @@ func (this *SuffixTree) walkDown(current *suffixTreeNode) bool {
 	return false
 }
 
-func (this *SuffixTree) extendSuffixTree(pos int) {
+func (this *SuffixTree) extend(pos int) {
 	// Extension Rule 1, this takes care of extending all leaves created so far in tree.
 	this.leafEnd = pos
 	// Indicates that a new suffix added to the list of suffixes yet to be added in tree.
@@ -133,7 +154,7 @@ func (this *SuffixTree) extendSuffixTree(pos int) {
 	// Add all suffixes (yet to be added) one by one in tree.
 	for this.remainingSuffixCount > 0 {
 		if this.activeLength == 0 {
-			this.activeEdge = int(this.text[pos] - ' ')
+			this.activeEdge = int(this.text[pos])
 		}
 		if this.activeNode.children[this.activeEdge] == nil {
 			// If there is no outgoing edge starting with activeEdge from activeNode,
@@ -174,18 +195,20 @@ func (this *SuffixTree) extendSuffixTree(pos int) {
 			// and current character being processed is not on the edge (we fall off the tree).
 			// In this case, it has to add a new internal node and a new leaf edge going out of that new node.
 			// This is Extension Rule 2, where a new leaf edge and a new internal node get created.
-			this.splitEnd = next.start + this.activeLength - 1
-			node := this.newNode(next.start, &this.splitEnd)
-			this.activeNode.children[this.activeEdge] = node
+			splitEnd := new(int)
+			*splitEnd = next.start + this.activeLength - 1
+			internal := this.newNode(next.start, splitEnd)
+			this.activeNode.children[this.activeEdge] = internal
 			// New leaf coming out of new internal node
-			node.children[int(this.text[pos])] = this.newNode(pos, &this.leafEnd)
+			internal.children[int(this.text[pos])] = this.newNode(pos, &this.leafEnd)
+			// Existing leaf node out of new internal node
 			next.start += this.activeLength
-			node.children[this.activeEdge] = next
+			internal.children[int(this.text[next.start])] = next
 
 			// If there is any internal node created in last extensions of same phase
 			// which is still waiting for it's suffix link reset, do it now.
 			if this.lastNewNode != nil {
-				this.lastNewNode.suffixLink = node
+				this.lastNewNode.suffixLink = internal
 			}
 
 			// Make the current newly created internal node waiting for it's suffix link reset
@@ -193,57 +216,53 @@ func (this *SuffixTree) extendSuffixTree(pos int) {
 			// If we come across any other internal node (existing or newly created) in next extension of same phase
 			// when a new leaf edge gets added (i.e. when Extension Rule 2 applies is any of the next extension of
 			// same phase) at that point, suffixLink of this node will point to that internal node.
-			this.lastNewNode = node
+			this.lastNewNode = internal
 		}
 
 		// One suffix got added in tree.
 		this.remainingSuffixCount--
 		if this.activeNode == this.root && this.activeLength > 0 {
 			this.activeLength--
-			this.activeEdge = int(this.text[pos-this.remainingSuffixCount+1] - ' ')
+			this.activeEdge = int(this.text[pos-this.remainingSuffixCount+1])
 		} else if this.activeNode != this.root {
 			this.activeNode = this.activeNode.suffixLink
 		}
 	}
 }
 
-/* Print the suffix tree as well along with setting suffix index, so tree will be printed in DFS manner.
-Each edge along with it's suffix index will be printed. */
-func (this *SuffixTree) setSuffixIndexByDFS(node *suffixTreeNode, labelHeight int) {
+func (this *SuffixTree) FreeSuffixTreeByPostOrder(node *suffixTreeNode) {
 	if node == nil {
 		return
 	}
-	if node.start != -1 {
-		fmt.Printf("text[%d:%d]=", node.start, *node.end)
-		fmt.Print(this.text[node.start : *node.end+1])
-	}
-	isLeaf := true
 	keys := node.getSortedKeys()
 	for _, key := range keys {
 		if node.children[key] != nil {
-			if isLeaf && node.start != -1 {
-				fmt.Printf(" [%d]\n", node.suffixIndex)
-			}
-			// Current node is not a leaf as it has outgoing edges from it.
-			isLeaf = false
-			this.setSuffixIndexByDFS(node.children[key], labelHeight+node.children[key].edgeLength())
+			this.FreeSuffixTreeByPostOrder(node.children[key])
+			node.children[key] = nil
 		}
-	}
-	if isLeaf {
-		node.suffixIndex = this.size - labelHeight
-		fmt.Printf(" [%d]\n", node.suffixIndex)
 	}
 }
 
-func (this *SuffixTree) freeSuffixTreeByPostOrder(node *suffixTreeNode) {
-	if node == nil {
-		return
+func (this *SuffixTree) PrintPretty(node *suffixTreeNode, spaces int) {
+	s := "root "
+	if node.start != -1 {
+		s = fmt.Sprintf("--(%s)--> [%d,%d] ", this.text[node.start:*node.end+1], node.start, *node.end)
 	}
+	fmt.Print(s)
 	keys := node.getSortedKeys()
-	for _, key := range keys {
+	if len(keys) == 0 {
+		fmt.Println()
+	}
+	for i, key := range keys {
 		if node.children[key] != nil {
-			this.freeSuffixTreeByPostOrder(node.children[key])
-			node.children[key] = nil
+			if i == 0 {
+				this.PrintPretty(node.children[key], spaces+len(s))
+			} else {
+				for j := 0; j < spaces+len(s); j++ {
+					fmt.Print(" ")
+				}
+				this.PrintPretty(node.children[key], spaces+len(s))
+			}
 		}
 	}
 }
@@ -252,15 +271,18 @@ func (this *SuffixTree) Count() int {
 	return this.count
 }
 
+func (this *SuffixTree) Root() *suffixTreeNode {
+	return this.root
+}
+
 func NewSuffixTree(s string) *SuffixTree {
 	tree := &SuffixTree{activeEdge: -1, leafEnd: -1, size: len(s), text: s}
-	tree.rootEnd = -1
-	tree.root = tree.newNode(-1, &tree.rootEnd)
+	rootEnd := new(int)
+	*rootEnd = -1
+	tree.root = tree.newNode(-1, rootEnd)
 	tree.activeNode = tree.root
 	for i := 0; i < tree.size; i++ {
-		tree.extendSuffixTree(i)
+		tree.extend(i)
 	}
-	tree.setSuffixIndexByDFS(tree.root, 0)
-	tree.freeSuffixTreeByPostOrder(tree.root)
 	return tree
 }

@@ -52,6 +52,7 @@ func TestSuffixTree(t *testing.T) {
 	assert.Equal(t, 6, tree.Count())
 
 	tree2 := trie.NewSuffixTree("abcabxabcd$")
-	assert.Equal(t, 16, tree2.Count())
-	assert.Equal(t, 1, 2)
+	tree2.PrintPretty(tree2.Root(), 0)
+	tree2.FreeSuffixTreeByPostOrder(tree2.Root())
+	assert.Equal(t, 17, tree2.Count())
 }

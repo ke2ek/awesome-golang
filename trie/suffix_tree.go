@@ -1,6 +1,7 @@
 package trie
 
 import (
+	"awesome-golang/strings"
 	"fmt"
 	"sort"
 )
@@ -81,10 +82,11 @@ This can be useful to find each internal node to process the next suffix by O(1)
 */
 
 type suffixTreeNode struct {
-	start      int
-	end        *int
-	suffixLink *suffixTreeNode
-	children   map[int]*suffixTreeNode
+	start       int
+	end         *int
+	suffixIndex int
+	suffixLink  *suffixTreeNode
+	children    map[int]*suffixTreeNode
 }
 
 type SuffixTree struct {
@@ -104,7 +106,19 @@ type SuffixTree struct {
 	text                 string
 }
 
-func (this *suffixTreeNode) getSortedKeys() []int {
+func (this *SuffixTree) newNode(start int, end *int) *suffixTreeNode {
+	this.count++
+	node := &suffixTreeNode{
+		start:       start,
+		end:         end,
+		suffixIndex: -1,
+		suffixLink:  this.root,
+		children:    map[int]*suffixTreeNode{},
+	}
+	return node
+}
+
+func (this *suffixTreeNode) sortedKeys() []int {
 	keys := make([]int, 0, len(this.children))
 	for k := range this.children {
 		keys = append(keys, k)
@@ -118,24 +132,15 @@ func (this *suffixTreeNode) edgeLength() int {
 	return (*this.end) - this.start + 1
 }
 
-func (this *SuffixTree) newNode(start int, end *int) *suffixTreeNode {
-	this.count++
-	node := &suffixTreeNode{
-		start:      start,
-		end:        end,
-		suffixLink: this.root,
-		children:   map[int]*suffixTreeNode{},
-	}
-	return node
-}
-
 /* activePoint change for walk down (APCFWD) using Skip/Count Trick (Trick 1).
 If activeLength is greater than current edge length, set next internal node as activeNode
 and adjust activeEdge and activeLength accordingly to represent same activePoint */
-func (this *SuffixTree) walkDown(current *suffixTreeNode) bool {
+func (this *SuffixTree) walkDown(current *suffixTreeNode, pos int) bool {
 	edgeLen := current.edgeLength()
 	if this.activeLength >= edgeLen {
-		this.activeEdge = int(this.text[(*current.end)+1])
+		// Set up the character index to move from the current node to the next node
+		// by finding the original position of the character to be inserted in the current added suffix.
+		this.activeEdge = int(this.text[pos-this.remainingSuffixCount+1+edgeLen])
 		this.activeLength -= edgeLen
 		this.activeNode = current
 		return true
@@ -173,7 +178,7 @@ func (this *SuffixTree) extend(pos int) {
 			// If there is an outgoing edge starting with activeEdge from activeNode,
 			// Get the next node at the end of edge starting with activeEdge.
 			next := this.activeNode.children[this.activeEdge]
-			if this.walkDown(next) {
+			if this.walkDown(next, pos) {
 				// If it is walked down, start from next node (the new activeNode).
 				continue
 			}
@@ -230,11 +235,24 @@ func (this *SuffixTree) extend(pos int) {
 	}
 }
 
+// Set up suffix indices on leaf nodes where the suffix index means the start index of each suffix in the original text
+func (this *suffixTreeNode) setSuffixIndices(size, labelHeight int) {
+	if len(this.children) == 0 {
+		this.suffixIndex = size - labelHeight
+		return
+	}
+	keys := this.sortedKeys()
+	for _, key := range keys {
+		nextLabelHeight := labelHeight + this.children[key].edgeLength()
+		this.children[key].setSuffixIndices(size, nextLabelHeight)
+	}
+}
+
 func (this *SuffixTree) FreeSuffixTreeByPostOrder(node *suffixTreeNode) {
 	if node == nil {
 		return
 	}
-	keys := node.getSortedKeys()
+	keys := node.sortedKeys()
 	for _, key := range keys {
 		if node.children[key] != nil {
 			this.FreeSuffixTreeByPostOrder(node.children[key])
@@ -248,11 +266,11 @@ func (this *SuffixTree) PrintPretty(node *suffixTreeNode, spaces int) {
 	if node.start != -1 {
 		s = fmt.Sprintf("--(%s)--> [%d,%d] ", this.text[node.start:*node.end+1], node.start, *node.end)
 	}
-	fmt.Print(s)
-	keys := node.getSortedKeys()
-	if len(keys) == 0 {
-		fmt.Println()
+	if len(node.children) == 0 {
+		s += fmt.Sprintf(", SuffixIndex: %d\n", node.suffixIndex)
 	}
+	fmt.Print(s)
+	keys := node.sortedKeys()
 	for i, key := range keys {
 		if node.children[key] != nil {
 			for j := 0; i > 0 && j < spaces+len(s); j++ {
@@ -280,5 +298,169 @@ func NewSuffixTree(s string) *SuffixTree {
 	for i := 0; i < tree.size; i++ {
 		tree.extend(i)
 	}
+	tree.root.setSuffixIndices(tree.size, 0)
 	return tree
+}
+
+/* Below util Functions will take the time complexity by O(N)
+where N is the number of nodes in a suffix tree. */
+
+// Return whether the text of this tree contains a given string or not.
+func (this *SuffixTree) HasSubString(s string) bool {
+	node := this.root
+	i := 0
+	for i < len(s) {
+		if node.start != -1 {
+			for j := node.start + 1; i < len(s) && j <= *node.end; j++ {
+				if this.text[j] != s[i] {
+					return false
+				}
+				i++
+			}
+			if i == len(s) {
+				break
+			}
+		}
+		if node.children[int(s[i])] == nil {
+			return false
+		}
+		node = node.children[int(s[i])]
+		i++
+	}
+	return true
+}
+
+// Return the number of leaf nodes in this suffix tree.
+func (this *suffixTreeNode) countLeaf() int {
+	numLeafs := 0
+	for _, child := range this.children {
+		numLeafs += child.countLeaf()
+	}
+	if numLeafs == 0 {
+		return 1
+	}
+	return numLeafs
+}
+
+func (this *SuffixTree) CountLeaf() int {
+	if len(this.root.children) == 0 {
+		return 0
+	}
+	return this.root.countLeaf()
+}
+
+// Return the longest repeated substring.
+func (this *SuffixTree) getLongestRepeatedSubstring(node *suffixTreeNode, limit *int) string {
+	longest := ""
+	if len(node.children) == 0 {
+		return longest
+	}
+	// Below will be done when getting the longest common substring.
+	if this.root.end != limit && *node.end > *limit {
+		return longest
+	}
+	prefix := ""
+	if node.start != -1 {
+		prefix = this.text[node.start : *node.end+1]
+	}
+	keys := node.sortedKeys()
+	for _, key := range keys {
+		// If child has a leaf node, then it doesn't have to go down to it.
+		s := prefix + this.getLongestRepeatedSubstring(node.children[key], limit)
+		if len(s) > len(longest) {
+			longest = s
+		}
+	}
+	return longest
+}
+
+func (this *SuffixTree) LongestRepeatedSubstring() string {
+	/* repeated substrings will share on the same path because one node can't have
+	more than one outgoing edge starting with same character.
+	Also, we could easily find them by checking if there is an internal node
+	at the end of the path of a given substring in the tree.
+
+	Thus, the path representing the longest repeated substring will have
+	the deepest internal node of the suffix tree at the end. */
+	return this.getLongestRepeatedSubstring(this.root, this.root.end)
+}
+
+// Return the suffix array.
+func (this *SuffixTree) makeSuffixArray(node *suffixTreeNode, arr []int, idx *int) {
+	// If it is a leaf node other than "$" label.
+	if node.suffixIndex > -1 && node.suffixIndex < this.size-1 {
+		arr[*idx] = node.suffixIndex
+		(*idx)++
+		return
+	}
+	keys := node.sortedKeys()
+	for _, key := range keys {
+		this.makeSuffixArray(node.children[key], arr, idx)
+	}
+}
+
+func (this *SuffixTree) SuffixArray() []int {
+	suffixArray := make([]int, this.size-1)
+	for i := 0; i < this.size-1; i++ {
+		suffixArray[i] = -1
+	}
+	idx := 0
+	this.makeSuffixArray(this.root, suffixArray, &idx)
+	return suffixArray
+}
+
+// Return the longest common substirng.
+// In general, LCS of two strings can be given from DP by taking O(N * M)
+// where N and M are the length of two strings respectively.
+// But, we are gonna get it by O(N + M) using a suffix tree.
+func LongestCommonSubstring(s1, s2 string) string {
+	concatenation := ""
+	minLen := len(s1)
+	if len(s1) < len(s2) {
+		concatenation = s1 + "#" + s2 + "$"
+	} else {
+		concatenation = s2 + "#" + s1 + "$"
+		minLen = len(s2)
+	}
+	tree := NewSuffixTree(concatenation)
+	lcs := tree.getLongestRepeatedSubstring(tree.root, &minLen)
+	tree.FreeSuffixTreeByPostOrder(tree.root)
+	return lcs
+}
+
+// Return the longest palindromic substirng.
+// In gnenral, naive algorithm will take O(N^3) and quadratic algorithm will take O(N^2) and
+// Manacher’s Algorithm will take O(N), where N is the length of a given string.
+// Using a suffix tree, it is also going to take linear time.
+func (this *SuffixTree) findLongestPalindromicSubstring(node *suffixTreeNode, palindrome *string) string {
+	longest := ""
+	if len(node.children) == 0 {
+		return longest
+	}
+	prefix := ""
+	if node.start != -1 {
+		prefix = this.text[node.start : *node.end+1]
+	}
+	keys := node.sortedKeys()
+	for _, key := range keys {
+		s := prefix + this.findLongestPalindromicSubstring(node.children[key], palindrome)
+		if len(s) > len(longest) {
+			if strings.IsPalindrome(s) {
+				if len(s) > len(*palindrome) {
+					*palindrome = s
+				}
+			}
+			longest = s
+		}
+	}
+	return longest
+}
+
+func LongestPalindromicSubstring(s string) string {
+	tree := NewSuffixTree(s + "$") //concatenation)
+	tree.PrintPretty(tree.root, 0)
+	lps := ""
+	tree.findLongestPalindromicSubstring(tree.root, &lps)
+	tree.FreeSuffixTreeByPostOrder(tree.root)
+	return lps
 }

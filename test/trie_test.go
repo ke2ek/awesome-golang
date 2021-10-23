@@ -139,6 +139,5 @@ func TestLongestPalindromicSubstring(t *testing.T) {
 	ans := []string{"bbaabb", "geeksskeeg", "a", "a", "aba", "cdc", "aba", "xabax", "aba", "ababa"}
 	for i, tc := range testcases {
 		assert.Equal(t, ans[i], trie.LongestPalindromicSubstring(tc))
-		break
 	}
 }

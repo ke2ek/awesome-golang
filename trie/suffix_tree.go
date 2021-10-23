@@ -1,7 +1,6 @@
 package trie
 
 import (
-	"awesome-golang/strings"
 	"fmt"
 	"sort"
 )
@@ -87,6 +86,9 @@ type suffixTreeNode struct {
 	suffixIndex int
 	suffixLink  *suffixTreeNode
 	children    map[int]*suffixTreeNode
+	// Below will be used to find the longest palindromic substring.
+	forwardIndices map[int]bool
+	reverseIndices map[int]bool
 }
 
 type SuffixTree struct {
@@ -109,11 +111,13 @@ type SuffixTree struct {
 func (this *SuffixTree) newNode(start int, end *int) *suffixTreeNode {
 	this.count++
 	node := &suffixTreeNode{
-		start:       start,
-		end:         end,
-		suffixIndex: -1,
-		suffixLink:  this.root,
-		children:    map[int]*suffixTreeNode{},
+		start:          start,
+		end:            end,
+		suffixIndex:    -1,
+		suffixLink:     this.root,
+		children:       map[int]*suffixTreeNode{},
+		forwardIndices: map[int]bool{},
+		reverseIndices: map[int]bool{},
 	}
 	return node
 }
@@ -235,19 +239,6 @@ func (this *SuffixTree) extend(pos int) {
 	}
 }
 
-// Set up suffix indices on leaf nodes where the suffix index means the start index of each suffix in the original text
-func (this *suffixTreeNode) setSuffixIndices(size, labelHeight int) {
-	if len(this.children) == 0 {
-		this.suffixIndex = size - labelHeight
-		return
-	}
-	keys := this.sortedKeys()
-	for _, key := range keys {
-		nextLabelHeight := labelHeight + this.children[key].edgeLength()
-		this.children[key].setSuffixIndices(size, nextLabelHeight)
-	}
-}
-
 func (this *SuffixTree) FreeSuffixTreeByPostOrder(node *suffixTreeNode) {
 	if node == nil {
 		return
@@ -267,7 +258,7 @@ func (this *SuffixTree) PrintPretty(node *suffixTreeNode, spaces int) {
 		s = fmt.Sprintf("--(%s)--> [%d,%d] ", this.text[node.start:*node.end+1], node.start, *node.end)
 	}
 	if len(node.children) == 0 {
-		s += fmt.Sprintf(", SuffixIndex: %d\n", node.suffixIndex)
+		s += fmt.Sprintf(", Suffix Index = %d\n", node.suffixIndex)
 	}
 	fmt.Print(s)
 	keys := node.sortedKeys()
@@ -298,7 +289,6 @@ func NewSuffixTree(s string) *SuffixTree {
 	for i := 0; i < tree.size; i++ {
 		tree.extend(i)
 	}
-	tree.root.setSuffixIndices(tree.size, 0)
 	return tree
 }
 
@@ -386,7 +376,44 @@ func (this *SuffixTree) LongestRepeatedSubstring() string {
 }
 
 // Return the suffix array.
+// Set up suffix indices on leaf nodes where the suffix index means the start index of each suffix in the original text
+func (this *SuffixTree) SetSuffixIndices(node *suffixTreeNode, labelLength int, allowPalindromic bool) {
+	if len(node.children) == 0 {
+		if allowPalindromic {
+			for i := node.start; i <= *node.end; i++ {
+				if this.text[i] == '#' {
+					node.end = new(int)
+					*node.end = i
+				}
+			}
+		}
+		node.suffixIndex = this.size - labelLength
+		if node.suffixIndex < this.size/2 {
+			node.forwardIndices[node.suffixIndex] = true
+		} else {
+			node.reverseIndices[node.suffixIndex-(this.size/2)] = true
+		}
+		return
+	}
+	keys := node.sortedKeys()
+	for _, key := range keys {
+		updateLength := labelLength + node.children[key].edgeLength()
+		this.SetSuffixIndices(node.children[key], updateLength, allowPalindromic)
+		if allowPalindromic {
+			if node.start != -1 {
+				for idx := range node.children[key].forwardIndices {
+					node.forwardIndices[idx] = true
+				}
+				for idx := range node.children[key].reverseIndices {
+					node.reverseIndices[idx] = true
+				}
+			}
+		}
+	}
+}
+
 func (this *SuffixTree) makeSuffixArray(node *suffixTreeNode, arr []int, idx *int) {
+	this.SetSuffixIndices(this.Root(), 0, false)
 	// If it is a leaf node other than "$" label.
 	if node.suffixIndex > -1 && node.suffixIndex < this.size-1 {
 		arr[*idx] = node.suffixIndex
@@ -429,38 +456,82 @@ func LongestCommonSubstring(s1, s2 string) string {
 }
 
 // Return the longest palindromic substirng.
-// In gnenral, naive algorithm will take O(N^3) and quadratic algorithm will take O(N^2) and
-// Manacher’s Algorithm will take O(N), where N is the length of a given string.
-// Using a suffix tree, it is also going to take linear time.
-func (this *SuffixTree) findLongestPalindromicSubstring(node *suffixTreeNode, palindrome *string) string {
-	longest := ""
-	if len(node.children) == 0 {
-		return longest
-	}
-	prefix := ""
-	if node.start != -1 {
-		prefix = this.text[node.start : *node.end+1]
-	}
-	keys := node.sortedKeys()
-	for _, key := range keys {
-		s := prefix + this.findLongestPalindromicSubstring(node.children[key], palindrome)
-		if len(s) > len(longest) {
-			if strings.IsPalindrome(s) {
-				if len(s) > len(*palindrome) {
-					*palindrome = s
+/* In gnenral, naive algorithm will take O(N^3) and quadratic algorithm will take O(N^2) and
+Manacher’s Algorithm will take O(N), where N is the length of a given string.
+Using a suffix tree, it is also going to take linear time.
+
+
+N-1   N-1-i      N-1-j    0  => Reverse Index (of R)
+ |------|----------|------|
+ 0      i          j     N-1 => Forward Index (of S)
+        <---------->
+           L=j+1-i
+
+If S[i:i+L] is palindromic, then it will satisfy the following conditions:
+1. A character with index i (forward index) in a string S of length N, will be at index N-1-i (reverse index)
+in it’s reversed string R.
+2. If there is a common substring of length L at indices Si (forward index) and Ri (reverse index) in S and R,
+then these will come from same position in S if Ri = (N – 1) – (Si + L – 1) where N is string length.
+i.e. if substring in S is at index Si, then same substring should be in R at index (N – 1) – (Si + L – 1).
+3. all leaf nodes will have one forward or reverse index depending on which string (S or R) they belong to.
+Then children’s forward or reverse indices propagate to the parent.
+
+In summary, when "S#R$" is added into a suffix tree, a common substirng of S and R is represented on the same internal nodes.
+After forward/reverse indices are propagated from children to their own parent, an internal node representing palindromic substring
+has Si and Ri which satisfy that Ri = (N-1) - (Si+L-1), where L is the length of substring.
+because a reverse index means the start index of a suffix and, if it is Ri like above, a common substring in R and S
+must be from same position in S. (e.g. S[Si:Si+L] == R[Ri:Ri+L])
+
+Given a string S="cabbaabb", we can see like below:
+
+c a b b a a b b = R
+7 6 5 4 3 2 1 0 = Ri
+c a b b a a b b = S
+0 1 2 3 4 5 6 7 = Si
+
+Si = 4, L = 4 -> S[4:8]="aabb" (j=i+L-1=4+4-1=7)
+Is it palindromic? No.
+
+N-1-j = 8-1-7 = 0
+N-1-i = 8-1-4 = 3
+
+R[0:4]="bbaa" != S[4:8]="aabb"
+
+If R[0:4] were "aabb", an internal node representing "aabb" would have Si with 4 and Ri with 0 (=(8-1)-(4+4-1)).
+RE: Ri = (N – 1) – (Si + L – 1), which means the start index of a common substring in R (=reversed a common substring of S).
+*/
+func (this *suffixTreeNode) findLongestPalindromicSubstring(n, labelLength int, maxLength, startIndex *int) {
+	// If this is an internal node
+	if this.suffixIndex == -1 {
+		keys := this.sortedKeys()
+		for _, key := range keys {
+			this.children[key].findLongestPalindromicSubstring(n, labelLength+this.children[key].edgeLength(), maxLength, startIndex)
+			if labelLength > *maxLength && len(this.forwardIndices) > 0 && len(this.reverseIndices) > 0 {
+				for idx := range this.forwardIndices {
+					reverseIndex := (n - 1) - (idx + labelLength - 1)
+					// If reverse suffix comes from SAME position in given string, then keep track of deepest node.
+					if this.reverseIndices[reverseIndex] {
+						*maxLength = labelLength
+						*startIndex = *this.end - labelLength + 1
+						break
+					}
 				}
 			}
-			longest = s
 		}
 	}
-	return longest
 }
 
 func LongestPalindromicSubstring(s string) string {
-	tree := NewSuffixTree(s + "$") //concatenation)
+	concatenation := s + "#"
+	for i := len(s) - 1; i >= 0; i-- {
+		concatenation += s[i : i+1]
+	}
+	concatenation += "$"
+	tree := NewSuffixTree(concatenation)
+	tree.SetSuffixIndices(tree.root, 0, true)
 	tree.PrintPretty(tree.root, 0)
-	lps := ""
-	tree.findLongestPalindromicSubstring(tree.root, &lps)
+	maxLength, startIndex := 0, 0
+	tree.root.findLongestPalindromicSubstring(len(s), 0, &maxLength, &startIndex)
 	tree.FreeSuffixTreeByPostOrder(tree.root)
-	return lps
+	return tree.text[startIndex : startIndex+maxLength]
 }

@@ -364,7 +364,7 @@ func (this *SuffixTree) getLongestRepeatedSubstring(node *suffixTreeNode, limit 
 	return longest
 }
 
-func (this *SuffixTree) LongestRepeatedSubstring() string {
+func LongestRepeatedSubstring(s string) string {
 	/* repeated substrings will share on the same path because one node can't have
 	more than one outgoing edge starting with same character.
 	Also, we could easily find them by checking if there is an internal node
@@ -372,7 +372,11 @@ func (this *SuffixTree) LongestRepeatedSubstring() string {
 
 	Thus, the path representing the longest repeated substring will have
 	the deepest internal node of the suffix tree at the end. */
-	return this.getLongestRepeatedSubstring(this.root, this.root.end)
+	tree := NewSuffixTree(s)
+	tree.PrintPretty(tree.root, 0)
+	lps := tree.getLongestRepeatedSubstring(tree.root, tree.root.end)
+	tree.FreeSuffixTreeByPostOrder(tree.root)
+	return lps
 }
 
 // Return the suffix array.

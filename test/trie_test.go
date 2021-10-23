@@ -80,10 +80,7 @@ func TestLongestRepeatedSubstring(t *testing.T) {
 	}
 	ans := []string{"GEEKS", "AAAAAAAAA", "", "ABABA", "ATCGA", "ana", "ab", "ab"}
 	for i, tc := range testcases {
-		tree := trie.NewSuffixTree(tc)
-		assert.Equal(t, ans[i], tree.LongestRepeatedSubstring())
-		tree.PrintPretty(tree.Root(), 0)
-		tree.FreeSuffixTreeByPostOrder(tree.Root())
+		assert.Equal(t, ans[i], trie.LongestRepeatedSubstring(tc))
 	}
 }
 

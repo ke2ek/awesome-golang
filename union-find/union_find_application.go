@@ -6,6 +6,10 @@ func HasCycle(graph [][]int) bool {
 	ds := NewDisjointSet(len(graph))
 	for u := 0; u < len(graph); u++ {
 		for _, v := range graph[u] {
+			if v < u {
+				// Edges that have been already merged will be excluded. (only if a graph is an undirected graph)
+				continue
+			}
 			setU := ds.Find(u)
 			setV := ds.Find(v)
 			if setU == setV {
@@ -22,20 +26,17 @@ func CountCycle(graph [][]int) int {
 	ds := NewDisjointSet(len(graph))
 	for u := 0; u < len(graph); u++ {
 		for _, v := range graph[u] {
-			setU := ds.Find(u)
-			setV := ds.Find(v)
-			if setU != setV {
-				ds.Union(setU, setV)
+			if v < u {
+				// Edges that have been already merged will be excluded. (only if a graph is an undirected graph)
+				continue
 			}
-		}
-	}
-	for u := 0; u < len(graph); u++ {
-		for _, v := range graph[u] {
 			setU := ds.Find(u)
 			setV := ds.Find(v)
-			if setU != setV {
+			if setU == setV {
 				numCycles++
+				continue
 			}
+			ds.Union(setU, setV)
 		}
 	}
 	return numCycles

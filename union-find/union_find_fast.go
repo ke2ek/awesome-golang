@@ -54,3 +54,11 @@ func (this *DisjointSet) Union(u, v int) {
 		this.rank[v]++
 	}
 }
+
+func (this *DisjointSet) Parent() []int {
+	return this.parent
+}
+
+func (this *DisjointSet) Rank() []int {
+	return this.rank
+}

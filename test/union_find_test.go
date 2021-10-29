@@ -107,3 +107,23 @@ func TestDetectCycle(t *testing.T) {
 	assert.Equal(t, 0, unionFind.CountCycle(graph2))
 	assert.Equal(t, 3, unionFind.CountCycle(graph3))
 }
+
+func TestMaxProfitSum(t *testing.T) {
+	jobs1 := [][]int{
+		{2, 100},
+		{1, 19},
+		{2, 27},
+		{1, 25},
+		{3, 15},
+	}
+	jobs2 := [][]int{
+		{4, 20},
+		{1, 10},
+		{1, 40},
+		{1, 30},
+	}
+	maxSum1 := unionFind.MaxProfitSum(jobs1)
+	assert.Equal(t, 142, maxSum1)
+	maxSum2 := unionFind.MaxProfitSum(jobs2)
+	assert.Equal(t, 60, maxSum2)
+}

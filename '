@@ -1,0 +1,34 @@
+package floydwarshall
+
+/*
+Floyd-Warshall algorithm is to find the shortest path for all pairs of vertices in an weighted graph withour any cycle
+by discovering the shortest path between each neighbor and the current vertex.
+
+How it works:
+Assume that DistS(u, v) is the shortest distance between u and v in the set of verteices, S, and
+DistS-x(u, v) is the shortest distance between u and v, not via the vertex, x.
+
+We can know that: DistS(u, v) = min(DistS(u, x) + DistS(x, v), DistS-x(u, v))
+
+Notice that every edges in the shortest path should satisfy above expression.
+*/
+
+// O(V^3) where V is the number of vertices.
+// Assume that graph is an adjacency list. e.g., graph[i][0] = (next vertex, the cost of the path)
+func GetShortestPathNaive(graph [][][2]int, source int) [][][]int {
+	V := len(graph)
+	dist := make([][][]int, V)
+	for i := 0; i < V; i++ {
+		dist[i] = make([][]int, V)
+		for j := 0; j < V; j++ {
+			dist[i][j] = make([]int, V)
+		}
+	}
+	return nil
+}
+
+func GetShortestPath(graph [][][2]int, source int) [][]int {
+	return nil
+}
+
+func Reconstruct() {}

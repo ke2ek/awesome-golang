@@ -6,6 +6,8 @@ import (
 	"reflect"
 )
 
+const INF = 987654321
+
 type Element struct {
 	Value interface{}
 }

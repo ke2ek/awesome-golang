@@ -30,7 +30,7 @@ func GetShortestPath(graph [][][2]int, source int) []int {
 	pq.Push(0, source) // (length fo path, vertex)
 	for !pq.Empty() {
 		node := pq.Pop()
-		cost := node.Key
+		cost := -node.Key
 		here := node.Value.(int)
 
 		// If the current vertex has been already chosen by the shorter distance, ignore.

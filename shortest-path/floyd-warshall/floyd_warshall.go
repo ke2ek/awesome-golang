@@ -1,6 +1,8 @@
 package floydwarshall
 
-import "awesome-golang/common"
+import (
+	"awesome-golang/common"
+)
 
 /*
 Floyd-Warshall algorithm is to find the shortest path for all pairs of vertices in an weighted graph withour any cycle
@@ -29,7 +31,6 @@ func convertAdjacencyToMatrix(graph [][][2]int) [][]int {
 		for _, nbr := range graph[u] {
 			v, cost := nbr[0], nbr[1]
 			matrix[u][v] = cost
-			matrix[v][u] = cost
 		}
 	}
 	return matrix
@@ -37,7 +38,7 @@ func convertAdjacencyToMatrix(graph [][][2]int) [][]int {
 
 // O(V^3) where V is the number of vertices.
 // Assume that graph is an adjacency list. e.g., graph[i][0] = (next vertex, the cost of the path)
-func GetShortestPathNaive(graph [][][2]int, source int) [][][]int {
+func GetShortestPathNaive(graph [][][2]int) [][][]int {
 	V := len(graph)
 	// Initialize
 	dist := make([][][]int, V)
@@ -58,7 +59,7 @@ func GetShortestPathNaive(graph [][][2]int, source int) [][][]int {
 	}
 
 	// Calculate the shortest path.
-	for k := 0; k < V; k++ {
+	for k := 1; k < V; k++ {
 		for i := 0; i < V; i++ {
 			for j := 0; j < V; j++ {
 				dist[k][i][j] = common.Min(dist[k-1][i][j], dist[k-1][i][k]+dist[k-1][k][j])
@@ -70,7 +71,7 @@ func GetShortestPathNaive(graph [][][2]int, source int) [][][]int {
 
 // O(V^2) where V is the number of vertices.
 // Advanced Implementation with Sliding Window in DP.
-func GetShortestPath(graph [][][2]int, source int) (matrix, via [][]int) {
+func GetShortestPath(graph [][][2]int) (matrix, via [][]int) {
 	V := len(graph)
 	matrix = convertAdjacencyToMatrix(graph)
 	// It is used to reconstruct the shortest path.
@@ -90,7 +91,7 @@ func GetShortestPath(graph [][][2]int, source int) (matrix, via [][]int) {
 			}
 			for v := 0; v < V; v++ {
 				//matrix[u][v] = common.Min(matrix[u][v], matrix[u][k]+matrix[k][v])
-				if matrix[u][v] < matrix[u][k]+matrix[k][v] {
+				if matrix[u][v] > matrix[u][k]+matrix[k][v] {
 					via[u][v] = k
 					matrix[u][v] = matrix[u][k] + matrix[k][v]
 				}
@@ -102,16 +103,18 @@ func GetShortestPath(graph [][][2]int, source int) (matrix, via [][]int) {
 }
 
 // Reconstruct the shortest path from u to v.
-func Reconstruct(u, v int, matrix, via [][]int, path []int) {
+func Reconstruct(u, v int, matrix, via [][]int, path *[]int) {
 	if via[u][v] == -1 {
-		path = append(path, u)
+		*path = append(*path, u)
 		if u != v {
-			path = append(path, v)
+			*path = append(*path, v)
 		}
 	} else {
 		k := via[u][v]
 		Reconstruct(u, k, matrix, via, path)
-		path = path[:len(path)-1] // Prevent duplicating k.
+		if len(*path) > 0 {
+			*path = (*path)[:len(*path)-1] // Prevent duplicating k.
+		}
 		Reconstruct(k, v, matrix, via, path)
 	}
 }

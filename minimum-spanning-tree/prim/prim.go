@@ -17,7 +17,7 @@ func GetMinimumCost(graph [][]int) ([][2]int, int) {
 	minWeight := make([]int, V) // It will set to the minimum weight from i-th vertex.
 	opposite := make([]int, V)  // It will set to the opposite of i-th vertex on the edge with minWeight[i].
 	// 1. Initialize minWeight[0] = 0, opposite[0] = 0, isAdded[i] = false
-	for i := 0; i < V; i++ {
+	for i := 1; i < V; i++ {
 		minWeight[i], opposite[i] = INF, -1
 	}
 	ret := 0
@@ -26,20 +26,25 @@ func GetMinimumCost(graph [][]int) ([][2]int, int) {
 		// 2. Find the next vertex which is not still contained in the current MST.
 		next := -1
 		for v := 0; v < V; v++ {
-			if !isAdded[v] && (next == -1 || minWeight[next] > minWeight[v]) {
-				next = v
+			if isAdded[v] {
+				continue
 			}
+			if next != -1 && minWeight[next] < minWeight[v] {
+				continue
+			}
+			next = v
 		}
-		// 3. Add a new edge to the MST if the edge is not included.
+		// if the next vertex is the first vertex to be added, skip.
 		if opposite[next] != next {
 			mst = append(mst, [2]int{next, opposite[next]})
 		}
+		// 3. Add a new edge to the MST if the edge is not included.
 		ret += minWeight[next]
 		isAdded[next] = true
 		// 4. Update minWeight and visit adjacency edges of next by choosing the edge with the minimum weight.
 		for v := 0; v < V; v++ {
-			if graph[next][v] > 0 {
-				if !isAdded[v] && minWeight[v] > graph[next][v] {
+			if graph[next][v] > 0 && !isAdded[v] {
+				if minWeight[v] > graph[next][v] {
 					opposite[v] = next
 					minWeight[v] = graph[next][v]
 				}

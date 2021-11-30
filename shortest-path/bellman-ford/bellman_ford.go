@@ -21,9 +21,9 @@ Process:
 	- It works only in a weighted graph without a cycle.
 4. Repeat relaxing on every edges at most (V-1) times, where V is the number of vertices.
 
-To check if a given graph has a cycle with negative weights, it iwll repeat relaxing at most V times.
-If relaxing fails at the V-th iteration, it happens to be the graph with a cycle.
-(Notice that a cycle with negative weights reduces the toal cost of the shortest path whenever we calculate.)
+To check if a given graph has a cycle with negative weights, it will repeat relaxing at most V times.
+If relaxing successes at the V-th iteration, it happens to be the graph with a cycle.
+That's because the cycle with negative weights leads to reduce the cost of the shortest path.
 
 Time Complexity is O(V*E) where V is the number of vertices and E is the number of edges in a graph.
 */
